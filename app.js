@@ -40,7 +40,30 @@
     const fromUrl=p.get("ticket")&&p.get("track")?{id:p.get("ticket"),token:p.get("track"),room}:null;
     let saved=null;try{saved=JSON.parse(localStorage.getItem(storageKey(room))||"null")}catch(e){}
     tracking=fromUrl||saved;
-    if(tracking&&tracking.id&&tracking.token){showTracking();pollStatus(true)}
+    if(tracking&&tracking.id&&tracking.token){
+      showTracking();
+      pollStatus(true);
+      return;
+    }
+    restoreLatestByRoom(room);
+  }
+
+  async function restoreLatestByRoom(room){
+    if(!room||!apiReady())return;
+    try{
+      const res=await fetch(api+"/api/rooms/"+encodeURIComponent(room)+"/latest",{cache:"no-store"});
+      if(res.status===404)return;
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok)throw new Error(data.message||"恢复进度失败");
+      const t=data.ticket;
+      if(!t||!t.id||!t.guest_token)return;
+      saveTracking({id:t.id,token:t.guest_token,room});
+      showTracking();
+      updateTrackingView(t);
+      $("activeTicketPanel").scrollIntoView({behavior:"smooth",block:"start"});
+    }catch(e){
+      console.warn("未能自动恢复工单进度",e);
+    }
   }
   function saveTracking(t){
     tracking=t;localStorage.setItem(storageKey(t.room),JSON.stringify(t));
