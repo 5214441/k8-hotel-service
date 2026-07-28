@@ -1,0 +1,11 @@
+name = "k8-hotel-tickets"
+main = "worker.js"
+compatibility_date = "2026-07-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://5214441.github.io"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "k8-hotel-tickets"
+database_id = "部署后填写你的D1数据库ID"

@@ -1,11 +1,1 @@
-<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#173c35"><link rel="stylesheet" href="qr.css"><title>K8房间二维码生成器</title></head>
-<body><main class="wrap">
-<header><div><p>HOTEL QR MANAGER</p><h1>K8房间二维码生成器</h1><span>输入房号，批量生成可打印的住客服务二维码</span></div><a href="./">查看住客页面</a></header>
-<section class="control no-print"><label>住客服务网址<input id="baseUrl" type="url"></label><label>房间号<textarea id="rooms" rows="5" placeholder="支持：201-208、301,302,303 或每行一个房号"></textarea></label><div class="buttons"><button id="generate">生成二维码</button><button id="print">打印全部</button><button id="clear">清空</button></div><p class="tip">建议先部署 GitHub Pages，再打开本页生成二维码。网址会自动读取当前网站地址。</p></section>
-<section id="empty" class="empty"><b>尚未生成二维码</b><span>输入房间号后点击“生成二维码”</span></section>
-<section id="cards" class="cards"></section>
-</main>
-<script src="config.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="qr.js"></script></body></html>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>K8酒店房间二维码生成</title><link rel="stylesheet" href="qr.css"></head><body><main><header><h1>K8酒店房间二维码批量生成</h1><p>输入房号后生成每个房间的专属住客服务二维码。</p></header><section class="controls"><label>住客服务网址<input id="baseUrl" value="https://5214441.github.io/k8-hotel-service/"></label><label>房号（换行、空格或逗号分隔）<textarea id="rooms" rows="7" placeholder="201 202 203&#10;301 302 303"></textarea></label><div><button id="generate">生成二维码</button><button id="print">打印全部</button></div></section><section id="cards" class="cards"></section></main><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="qr.js"></script></body></html>

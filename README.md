@@ -1,62 +1,73 @@
-# 酒店房间微信二维码服务
+# K8酒店住客服务工单系统 V2
 
-独立静态网站，部署在一个全新的 GitHub 仓库中，不依赖原来的工具箱仓库。
+## 使用效果
 
-## 功能
+住客扫码选择服务后，点击“立即提交给前台”；前台 Windows 电脑上的 Edge 工单台会响铃并显示新工单。前台可接单、完成、交接和查看当天记录。
 
-- 房间专属链接：`?room=608`
-- 客房用品、清洁、布草、维修、续住、退房、开票、租车等服务选择
-- 自动生成可复制的微信服务单
-- 前台微信二维码展示
-- 房号二维码批量生成和打印
-- 手机端适配
+## 目录
 
-## 必须替换的图片
+- `index.html`：住客扫码服务页
+- `admin.html`：前台工单台
+- `qr.html`：房间二维码批量生成页
+- `config.js`：酒店名称、Worker 地址、前台姓名等配置
+- `worker/`：Cloudflare Worker + D1 后端
+- `windows/`：创建 Edge 桌面和开机启动快捷方式
 
-把前台微信二维码图片命名为：
+## 部署顺序
 
-`assets/wechat-qr.png`
+### 一、更新 GitHub 网站
 
-直接覆盖同名文件即可。当前压缩包内提供的是提示占位图（SVG），正式使用必须放入真实的微信二维码 PNG 图片。
+把压缩包根目录中的下列文件上传到 `5214441/k8-hotel-service` 仓库根目录，并覆盖同名文件：
 
-## 修改酒店信息
+`index.html、style.css、app.js、admin.html、admin.css、admin.js、config.js、manifest.webmanifest、sw.js、qr.html、qr.css、qr.js、assets`
 
-编辑 `config.js`：
+暂时不要修改 `config.js` 的 Worker 地址，等 Worker 部署成功后再改。
 
-- 酒店名称
-- 地址
-- 前台微信号（可留空）
-- 租车价格
-- Wi-Fi和退房提示
+### 二、创建 Cloudflare D1 数据库
 
-## GitHub 部署
+1. 登录 Cloudflare。
+2. 进入 **Workers & Pages → D1 SQL Database**。
+3. 创建数据库：`k8-hotel-tickets`。
+4. 打开数据库控制台，把 `worker/schema.sql` 全部复制进去执行。
 
-1. 在 GitHub 新建一个 Public 仓库，建议名称：`k8-hotel-service`
-2. 将本项目全部文件上传到仓库根目录，包括隐藏目录 `.github`
-3. 打开仓库 `Settings → Pages`
-4. 在 `Build and deployment` 中将 Source 选择为 `GitHub Actions`
-5. 打开 `Actions`，等待“部署酒店微信服务页”变成绿色对勾
+### 三、创建 Worker
 
-部署地址一般为：
+1. 进入 **Workers & Pages → Create → Worker**。
+2. 名称填写：`k8-hotel-tickets`。
+3. 打开在线编辑器，把默认代码全部删除。
+4. 将 `worker/worker.js` 全部复制进去并部署。
+5. 在 Worker 的 **Settings → Bindings** 中添加 D1：
+   - Variable name：`DB`
+   - Database：`k8-hotel-tickets`
+6. 在 **Settings → Variables and Secrets** 中添加：
+   - Secret：`ADMIN_PASSWORD`，值设置为前台管理密码
+   - Variable：`ALLOWED_ORIGINS`，值填写 `https://5214441.github.io`
+7. 再部署一次。
+8. 记下 Worker 地址，例如：
+   `https://k8-hotel-tickets.你的账号.workers.dev`
 
-`https://你的GitHub用户名.github.io/k8-hotel-service/`
+### 四、填写 Worker 地址
 
-二维码生成页：
+打开 GitHub 仓库根目录的 `config.js`，把：
 
-`https://你的GitHub用户名.github.io/k8-hotel-service/qr.html`
+`https://请替换为你的Worker地址.workers.dev`
 
-房间示例：
+替换成真实 Worker 地址并提交。
 
-`https://你的GitHub用户名.github.io/k8-hotel-service/?room=608`
+### 五、前台 Edge 设置
 
-## 使用流程
+1. 打开：
+   `https://5214441.github.io/k8-hotel-service/admin.html`
+2. 输入 `ADMIN_PASSWORD` 对应的管理密码。
+3. 选择当班前台。
+4. 点击“开启声音提醒”。
+5. 点击“开启桌面通知”并允许。
+6. 可直接双击 `windows/创建前台桌面和开机启动快捷方式.cmd`，创建桌面入口并设置开机启动。
 
-1. 在 `qr.html` 输入全部房间号并生成二维码
-2. 打印后放在对应房间
-3. 住客扫码选择服务
-4. 复制服务单
-5. 长按识别前台微信二维码并发送
+## 测试
 
-## 注意
+打开：
 
-这是纯静态网页，不会把住客请求自动推送到前台。住客需通过微信发送生成的服务单。
+`https://5214441.github.io/k8-hotel-service/?room=608`
+
+提交“两瓶矿泉水”，前台工单台应在数秒内响铃并出现608房工单。

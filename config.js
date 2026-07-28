@@ -1,15 +1,18 @@
 window.HOTEL_CONFIG = {
   hotelName: "K8智享酒店",
-  shortName: "K8",
-  address: "霍邱县城隍庙大街与新东环步行街交口西南角，东湖路511号",
-  wechatId: "",
-  wechatQr: "assets/wechat-qr.png",
-  checkOutText: "退房时间请以订单、房间提示或前台微信确认为准",
-  wifiText: "Wi-Fi名称和密码请查看房间提示，或通过微信联系前台",
+  shortName: "K8酒店",
+  address: "霍邱县",
+  wifiText: "请查看房间内Wi-Fi提示",
+  checkOutText: "请在退房前通过前台工单咨询",
+  // 部署 Cloudflare Worker 后，把下面地址改成你的 workers.dev 地址，不要以 / 结尾
+  apiBase: "https://请替换为你的Worker地址.workers.dev",
+  staffNames: ["前台A", "前台B"],
+  pollSeconds: 4,
+  overdueMinutes: 5,
   rentalPrices: [
-    { name: "经济型", price: 88, note: "日常代步" },
-    { name: "商务型", price: 138, note: "舒适出行" },
-    { name: "SUV", price: 188, note: "空间更大" },
-    { name: "七座", price: 228, note: "多人出行" }
+    { name: "经济型", price: "88元", note: "价格以现场确认为准" },
+    { name: "商务型", price: "138元", note: "价格以现场确认为准" },
+    { name: "SUV", price: "188元", note: "价格以现场确认为准" },
+    { name: "七座", price: "228元", note: "价格以现场确认为准" }
   ]
 };

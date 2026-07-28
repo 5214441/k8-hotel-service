@@ -1,0 +1,117 @@
+(function(){
+  const config=window.HOTEL_CONFIG||{};
+  const $=id=>document.getElementById(id);
+  const api=String(config.apiBase||"").replace(/\/$/,"");
+  let password=sessionStorage.getItem("k8_admin_password")||localStorage.getItem("k8_admin_password")||"";
+  let tickets=[],knownIds=new Set(),audioCtx=null,soundEnabled=false,lastAlarm=0;
+  let polling=false;
+  const staffKey="k8_current_staff";
+  function toast(msg){const el=$("toast");el.textContent=msg;el.classList.remove("hidden");clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.classList.add("hidden"),1800)}
+  function formatTime(s){if(!s)return "—";return new Date(s).toLocaleString("zh-CN",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false})}
+  function minsSince(s){return Math.max(0,Math.floor((Date.now()-new Date(s).getTime())/60000))}
+  function currentStaff(){return $("staffSelect").value||"前台"}
+  function authHeaders(){return {"Content-Type":"application/json","X-Admin-Password":password}}
+  function apiReady(){return /^https:\/\/.+/.test(api)&&!api.includes("请替换")}
+  async function request(path,options={}){
+    if(!apiReady())throw new Error("config.js 尚未填写 Worker 地址");
+    const res=await fetch(api+path,{...options,headers:{...authHeaders(),...(options.headers||{})}});
+    const data=await res.json().catch(()=>({}));
+    if(res.status===401)throw new Error("管理密码错误");
+    if(!res.ok)throw new Error(data.message||"请求失败");
+    return data;
+  }
+  function beep(){
+    if(!soundEnabled)return;
+    try{
+      audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+      const now=audioCtx.currentTime;
+      [0,.22,.44].forEach((d,i)=>{
+        const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+        osc.type="sine";osc.frequency.value=i===1?980:760;
+        gain.gain.setValueAtTime(.0001,now+d);gain.gain.exponentialRampToValueAtTime(.22,now+d+.02);gain.gain.exponentialRampToValueAtTime(.0001,now+d+.18);
+        osc.connect(gain).connect(audioCtx.destination);osc.start(now+d);osc.stop(now+d+.2);
+      });
+    }catch(e){}
+  }
+  function desktopNotify(t){
+    if(Notification.permission!=="granted")return;
+    const n=new Notification("K8酒店新工单 · "+t.room+"房",{body:(t.services||[]).join("、")+(t.remark?"\n"+t.remark:""),tag:t.id,renotify:true});
+    n.onclick=()=>{window.focus();n.close()};
+  }
+  function renderList(id,list,type){
+    const root=$(id);root.innerHTML="";
+    if(!list.length){root.innerHTML='<div class="empty">暂无工单</div>';return}
+    list.forEach(t=>{
+      const d=document.createElement("article");d.className="ticket";
+      if(type==="new"&&minsSince(t.created_at)>=(config.overdueMinutes||5))d.classList.add("overdue");
+      const services=Array.isArray(t.services)?t.services:(typeof t.services==="string"?JSON.parse(t.services||"[]"):[]);
+      d.innerHTML=`
+        <div class="ticket-head"><div class="room">${escapeHtml(t.room)}房</div><div class="ticket-id">${escapeHtml(t.id)}</div></div>
+        <div class="service">${escapeHtml(services.join("、")||"其他需求")}</div>
+        ${t.remark?`<div class="remark">${escapeHtml(t.remark)}</div>`:""}
+        <div class="meta">
+          <span>提交：${formatTime(t.created_at)}</span><span>等待：${minsSince(t.created_at)}分钟</span>
+          <span>称呼：${escapeHtml(t.guest_name||"未填写")}</span><span>接单：${escapeHtml(t.accepted_by||"—")}</span>
+        </div>
+        <div class="ticket-actions"></div>`;
+      const actions=d.querySelector(".ticket-actions");
+      if(type==="new"){
+        actions.append(button("立即接单","",()=>updateTicket(t.id,"accept")));
+        actions.append(button("取消","cancel",()=>updateTicket(t.id,"cancel")));
+      }else if(type==="accepted"){
+        actions.append(button("标记完成","complete",()=>updateTicket(t.id,"complete")));
+        actions.append(button("退回新工单","cancel",()=>updateTicket(t.id,"reopen")));
+      }
+      root.appendChild(d);
+    });
+  }
+  function button(text,cls,fn){const b=document.createElement("button");b.textContent=text;b.className=cls;b.onclick=fn;return b}
+  function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+  async function refresh(silent=false){
+    if(polling||!password)return;polling=true;
+    try{
+      const data=await request("/api/tickets?limit=200");
+      tickets=data.tickets||[];
+      $("networkBadge").textContent="在线";$("networkBadge").className="badge ok";
+      $("loginOverlay").classList.add("hidden");
+      const news=tickets.filter(x=>x.status==="new");
+      const accepted=tickets.filter(x=>x.status==="accepted");
+      const today=new Date().toLocaleDateString("en-CA");
+      const done=tickets.filter(x=>x.status==="completed"&&new Date(x.completed_at).toLocaleDateString("en-CA")===today);
+      renderList("newList",news,"new");renderList("acceptedList",accepted,"accepted");renderList("doneList",done,"done");
+      $("newCount").textContent=news.length;$("acceptedCount").textContent=accepted.length;$("doneCount").textContent=done.length;
+      const acceptedTimes=tickets.filter(x=>x.accepted_at&&x.created_at).map(x=>(new Date(x.accepted_at)-new Date(x.created_at))/60000).filter(x=>x>=0&&x<1440);
+      $("avgResponse").textContent=acceptedTimes.length?(acceptedTimes.reduce((a,b)=>a+b,0)/acceptedTimes.length).toFixed(1)+"分钟":"—";
+      news.forEach(t=>{if(!knownIds.has(t.id)){knownIds.add(t.id);beep();desktopNotify(t)}});
+      if(news.length&&Date.now()-lastAlarm>12000){beep();lastAlarm=Date.now()}
+      if(!silent)toast("工单已刷新");
+    }catch(e){
+      $("networkBadge").textContent=e.message.includes("密码")?"密码错误":"离线";
+      $("networkBadge").className="badge bad";
+      if(e.message.includes("密码")){$("loginOverlay").classList.remove("hidden");$("loginError").textContent=e.message;$("loginError").classList.remove("hidden")}
+      if(!silent)toast(e.message);
+    }finally{polling=false}
+  }
+  async function updateTicket(id,action){
+    try{await request("/api/tickets/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify({action,staff:currentStaff()})});toast(action==="accept"?"已接单":action==="complete"?"已完成":"状态已更新");await refresh(true)}
+    catch(e){toast(e.message)}
+  }
+  $("loginForm").onsubmit=async e=>{
+    e.preventDefault();password=$("passwordInput").value;
+    sessionStorage.setItem("k8_admin_password",password);
+    if($("rememberPassword").checked)localStorage.setItem("k8_admin_password",password);else localStorage.removeItem("k8_admin_password");
+    $("loginError").classList.add("hidden");await refresh(true);
+  };
+  $("logoutBtn").onclick=()=>{password="";sessionStorage.removeItem("k8_admin_password");localStorage.removeItem("k8_admin_password");$("loginOverlay").classList.remove("hidden")};
+  $("refreshBtn").onclick=()=>refresh();
+  $("soundBtn").onclick=async()=>{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();await audioCtx.resume();soundEnabled=true;$("soundBtn").textContent="声音提醒已开启";$("soundBtn").classList.add("active");beep()};
+  $("notifyBtn").onclick=async()=>{const p=await Notification.requestPermission();$("notifyBtn").textContent=p==="granted"?"桌面通知已开启":"通知未授权";if(p==="granted")$("notifyBtn").classList.add("active")};
+  (config.staffNames||["前台A","前台B"]).forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;$("staffSelect").appendChild(o)});
+  $("staffSelect").value=localStorage.getItem(staffKey)||$("staffSelect").options[0].value;
+  $("staffSelect").onchange=()=>localStorage.setItem(staffKey,$("staffSelect").value);
+  setInterval(()=>{$("clock").textContent=new Date().toLocaleString("zh-CN",{hour12:false})},1000);
+  setInterval(()=>refresh(true),(config.pollSeconds||4)*1000);
+  window.addEventListener("online",()=>refresh(true));window.addEventListener("offline",()=>{$("networkBadge").textContent="离线";$("networkBadge").className="badge bad"});
+  if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+  if(password){$("passwordInput").value=password;refresh(true)}
+})();

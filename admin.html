@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#102a43">
+  <meta name="description" content="K8智享酒店前台服务工单台">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="admin.css">
+  <title>K8酒店 · 前台工单台</title>
+</head>
+<body>
+  <header class="topbar">
+    <div><span class="logo">K8</span><div><h1>前台服务工单台</h1><p id="clock">正在同步时间</p></div></div>
+    <div class="top-actions">
+      <span id="networkBadge" class="badge ok">在线</span>
+      <button id="soundBtn" class="btn">开启声音提醒</button>
+      <button id="notifyBtn" class="btn">开启桌面通知</button>
+      <button id="refreshBtn" class="btn">立即刷新</button>
+    </div>
+  </header>
+
+  <section class="dutybar">
+    <label>当前值班人
+      <select id="staffSelect"></select>
+    </label>
+    <div class="summary">
+      <span>新工单 <b id="newCount">0</b></span>
+      <span>处理中 <b id="acceptedCount">0</b></span>
+      <span>今日完成 <b id="doneCount">0</b></span>
+      <span>平均响应 <b id="avgResponse">—</b></span>
+    </div>
+    <button id="logoutBtn" class="link-btn">退出管理</button>
+  </section>
+
+  <main class="board">
+    <section class="column new-column">
+      <div class="column-head"><h2>🔴 新工单</h2><small>未接单会持续提醒</small></div>
+      <div id="newList" class="ticket-list"></div>
+    </section>
+    <section class="column">
+      <div class="column-head"><h2>🟡 处理中</h2><small>完成后及时关闭</small></div>
+      <div id="acceptedList" class="ticket-list"></div>
+    </section>
+    <section class="column">
+      <div class="column-head"><h2>🟢 今日已完成</h2><small>用于交接和查询</small></div>
+      <div id="doneList" class="ticket-list"></div>
+    </section>
+  </main>
+
+  <div id="loginOverlay" class="overlay">
+    <form id="loginForm" class="login-card">
+      <div class="login-logo">K8</div>
+      <h2>前台工单台登录</h2>
+      <p>请输入部署时设置的管理密码。</p>
+      <input id="passwordInput" type="password" autocomplete="current-password" placeholder="管理密码" required>
+      <label class="remember"><input id="rememberPassword" type="checkbox"> 在这台前台电脑上记住密码</label>
+      <button class="primary" type="submit">进入工单台</button>
+      <div id="loginError" class="error hidden"></div>
+    </form>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
