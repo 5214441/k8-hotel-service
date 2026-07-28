@@ -5,7 +5,7 @@ window.HOTEL_CONFIG = {
   wifiText: "请查看房间内Wi-Fi提示",
   checkOutText: "请在退房前通过前台工单咨询",
   // 部署 Cloudflare Worker 后，把下面地址改成你的 workers.dev 地址，不要以 / 结尾
-  apiBase: "https://k8-hotel-tickets.aiyaoyao11.workers.dev",
+  apiBase: "https://k8-api.kkkk8888.ccwu.cc",
   staffNames: ["前台A", "前台B"],
   pollSeconds: 4,
   overdueMinutes: 5,
