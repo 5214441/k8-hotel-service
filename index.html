@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#173c35">
+  <meta name="description" content="K8智享酒店住客微信服务页">
+  <link rel="stylesheet" href="style.css">
+  <title>K8智享酒店 · 住客服务</title>
+</head>
+<body>
+  <main class="page-shell">
+    <header class="hero">
+      <div class="brand-row">
+        <div class="brand-mark">K8</div>
+        <div>
+          <p class="eyebrow">GUEST SERVICE</p>
+          <h1 id="hotelName">K8智享酒店</h1>
+        </div>
+      </div>
+      <div class="room-pill">当前房间 <strong id="roomNo">未识别</strong></div>
+      <p class="hero-copy">需要用品、清洁、维修、续住、开票或租车，选好后复制服务单，通过微信发给前台。</p>
+    </header>
+
+    <section class="notice-card">
+      <span class="notice-icon">微</span>
+      <div><strong>本酒店前台使用微信服务</strong><p>提交后请复制服务单，再长按识别前台微信二维码发送。</p></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head"><div><span>01</span><h2>选择服务</h2></div><small>可多选</small></div>
+      <div id="serviceGrid" class="service-grid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head"><div><span>02</span><h2>补充说明</h2></div><small>选填</small></div>
+      <textarea id="remark" rows="4" maxlength="200" placeholder="例如：需要两瓶水；空调不制冷；预计续住一天……"></textarea>
+      <div class="field-row">
+        <label>房间号<input id="roomInput" inputmode="numeric" placeholder="例如 608"></label>
+        <label>称呼<input id="guestName" maxlength="20" placeholder="例如 李先生"></label>
+      </div>
+      <button id="buildRequest" class="primary-btn">生成微信服务单</button>
+    </section>
+
+    <section id="requestPanel" class="panel request-panel hidden">
+      <div class="section-head"><div><span>03</span><h2>微信服务单</h2></div><small>复制后发送</small></div>
+      <pre id="requestText"></pre>
+      <div class="action-grid">
+        <button id="copyRequest" class="primary-btn">复制服务单</button>
+        <button id="openWechat" class="secondary-btn">尝试打开微信</button>
+      </div>
+      <p class="muted">部分浏览器不能直接唤起微信，此时复制后手动打开微信即可。</p>
+    </section>
+
+    <section class="panel wechat-panel">
+      <div class="section-head"><div><span>微信</span><h2>联系前台</h2></div><small>长按识别</small></div>
+      <div class="wechat-layout">
+        <div class="qr-box">
+          <img id="wechatQr" src="assets/wechat-qr.png" alt="前台微信二维码">
+          <div id="qrPlaceholder" class="qr-placeholder hidden"><b>待放入前台微信二维码</b><span>文件名：assets/wechat-qr.png</span></div>
+        </div>
+        <div class="wechat-copy">
+          <h3>发送步骤</h3>
+          <ol><li>点击“复制服务单”</li><li>长按识别二维码添加前台微信</li><li>粘贴服务单并发送</li></ol>
+          <button id="copyWechatId" class="secondary-btn hidden">复制前台微信号</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head"><div><span>租车</span><h2>住客专享租车</h2></div><small>价格以微信确认为准</small></div>
+      <div id="rentalGrid" class="rental-grid"></div>
+    </section>
+
+    <section class="panel info-panel">
+      <h2>入住小提示</h2>
+      <div class="info-list">
+        <div><b>Wi-Fi</b><span id="wifiText"></span></div>
+        <div><b>退房</b><span id="checkoutText"></span></div>
+        <div><b>地址</b><span id="hotelAddress"></span></div>
+      </div>
+    </section>
+
+    <footer><b>K8智享酒店</b><span>祝您入住愉快</span></footer>
+  </main>
+  <div id="toast" class="toast hidden"></div>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
