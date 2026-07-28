@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#173c35">
   <meta name="description" content="K8智享酒店住客服务">
-  <link rel="stylesheet" href="style.css?v=3.0">
+  <link rel="stylesheet" href="style.css?v=3.1">
   <title>K8智享酒店 · 住客服务</title>
 </head>
 <body>
@@ -24,44 +24,61 @@
       <div><strong>需求直接发送到前台电脑</strong><p>提交后请保留本页面，系统会自动更新接单状态和前台回复。</p></div>
     </section>
 
-    <section id="requestForm">
-    <section class="panel">
-      <div class="section-head"><div><span>01</span><h2>选择服务</h2></div><small>可多选</small></div>
-      <div id="serviceGrid" class="service-grid"></div>
-    </section>
-
-    <section class="panel">
-      <div class="section-head"><div><span>02</span><h2>补充说明</h2></div><small>选填</small></div>
-      <textarea id="remark" rows="4" maxlength="200" placeholder="例如：需要两瓶水；空调不制冷；预计续住一天……"></textarea>
-      <div class="field-row">
-        <label>房间号<input id="roomInput" inputmode="numeric" maxlength="12" placeholder="例如 608"></label>
-        <label>称呼<input id="guestName" maxlength="20" placeholder="例如 李先生（选填）"></label>
+    <section id="activeTicketPanel" class="panel tracking-panel hidden" aria-live="polite">
+      <div class="section-head">
+        <div><span>进度</span><h2>当前服务进度</h2></div>
+        <small id="trackingSync">正在更新</small>
       </div>
-      <button id="submitRequest" class="primary-btn">立即提交给前台</button>
-      <p id="apiWarning" class="api-warning hidden">系统尚未连接前台工单服务，请联系酒店管理员。</p>
-    </section>
 
-    <section id="activeTicketPanel" class="panel tracking-panel hidden">
-      <div class="section-head"><div><span>进度</span><h2>当前服务进度</h2></div><small id="trackingSync">正在更新</small></div>
       <div class="tracking-top">
-        <div><div id="trackingStatus" class="status-badge status-new">已提交</div><h3 id="trackingTitle">前台正在查看您的需求</h3><p id="trackingMessage">请稍候，页面会自动更新。</p></div>
+        <div class="tracking-main">
+          <div id="trackingStatus" class="status-badge status-new">已提交</div>
+          <h3 id="trackingTitle">前台正在查看您的需求</h3>
+          <p id="trackingMessage">请稍候，页面会自动更新。</p>
+        </div>
         <div class="ticket-mini">服务单号<br><strong id="trackingTicketId"></strong></div>
       </div>
+
       <div class="timeline">
         <div id="stepSubmitted" class="timeline-step active"><i>1</i><span>已提交</span></div>
         <div id="stepAccepted" class="timeline-step"><i>2</i><span>已接单</span></div>
         <div id="stepProcessing" class="timeline-step"><i>3</i><span>处理中</span></div>
         <div id="stepCompleted" class="timeline-step"><i>4</i><span>已完成</span></div>
       </div>
-      <div id="staffReplyBox" class="staff-reply hidden"><b>前台回复</b><p id="staffReply"></p><small id="etaText"></small></div>
-      <div class="tracking-actions"><button id="refreshStatus" class="secondary-btn">立即刷新进度</button><button id="closeTracking" class="ghost-btn hidden">关闭并提交新需求</button></div>
+
+      <div id="staffReplyBox" class="staff-reply hidden">
+        <div class="reply-label">前台回复</div>
+        <p id="staffReply"></p>
+        <small id="etaText"></small>
+      </div>
+
+      <div class="tracking-actions">
+        <button id="refreshStatus" class="secondary-btn">立即刷新进度</button>
+        <button id="closeTracking" class="ghost-btn hidden">关闭并提交新需求</button>
+      </div>
     </section>
 
-    <section class="panel">
-      <div class="section-head"><div><span>租车</span><h2>住客专享租车</h2></div><small>点击即可选择</small></div>
-      <div id="rentalGrid" class="rental-grid"></div>
-    </section>
+    <section id="requestForm">
+      <section class="panel">
+        <div class="section-head"><div><span>01</span><h2>选择服务</h2></div><small>可多选</small></div>
+        <div id="serviceGrid" class="service-grid"></div>
+      </section>
 
+      <section class="panel">
+        <div class="section-head"><div><span>02</span><h2>补充说明</h2></div><small>选填</small></div>
+        <textarea id="remark" rows="4" maxlength="200" placeholder="例如：需要两瓶水；空调不制冷；预计续住一天……"></textarea>
+        <div class="field-row">
+          <label>房间号<input id="roomInput" inputmode="numeric" maxlength="12" placeholder="例如 608"></label>
+          <label>称呼<input id="guestName" maxlength="20" placeholder="例如 李先生（选填）"></label>
+        </div>
+        <button id="submitRequest" class="primary-btn">立即提交给前台</button>
+        <p id="apiWarning" class="api-warning hidden">系统尚未连接前台工单服务，请联系酒店管理员。</p>
+      </section>
+
+      <section class="panel">
+        <div class="section-head"><div><span>租车</span><h2>住客专享租车</h2></div><small>点击即可选择</small></div>
+        <div id="rentalGrid" class="rental-grid"></div>
+      </section>
     </section>
 
     <section class="panel info-panel">
@@ -76,7 +93,7 @@
     <footer><b>K8智享酒店</b><span>祝您入住愉快</span></footer>
   </main>
   <div id="toast" class="toast hidden"></div>
-  <script src="config.js?v=3.0"></script>
-  <script src="app.js?v=3.0"></script>
+  <script src="config.js?v=3.1"></script>
+  <script src="app.js?v=3.1"></script>
 </body>
 </html>

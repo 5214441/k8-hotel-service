@@ -1,0 +1,3 @@
+把 index.html 和 style.css 上传到 GitHub 仓库根目录，覆盖同名文件。
+不要上传 config.js，不会影响酒店信息和 API 地址。
+提交后等待 Pages 部署变绿，再打开房间端网址并强制刷新。
