@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#102a43">
   <meta name="description" content="K8智享酒店前台服务工单台">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="admin.css?v=3.0">
   <title>K8酒店 · 前台工单台</title>
 </head>
 <body>
@@ -35,11 +35,11 @@
 
   <main class="board">
     <section class="column new-column">
-      <div class="column-head"><h2>🔴 新工单</h2><small>未接单会持续提醒</small></div>
+      <div class="column-head"><h2>🔴 新工单</h2><small>接单时可直接回复客人</small></div>
       <div id="newList" class="ticket-list"></div>
     </section>
     <section class="column">
-      <div class="column-head"><h2>🟡 处理中</h2><small>完成后及时关闭</small></div>
+      <div class="column-head"><h2>🟡 处理中</h2><small>可更新预计时间和回复</small></div>
       <div id="acceptedList" class="ticket-list"></div>
     </section>
     <section class="column">
@@ -61,7 +61,7 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="config.js"></script>
-  <script src="admin.js"></script>
+  <script src="config.js?v=3.0"></script>
+  <script src="admin.js?v=3.0"></script>
 </body>
 </html>
