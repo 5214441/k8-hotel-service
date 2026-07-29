@@ -31,11 +31,17 @@
     const article=document.createElement("article");article.className="room-card theme-"+theme;
     const top=document.createElement("div");top.className="card-top";
     const brand=document.createElement("div");brand.className="brand-lockup";
-    brand.append(logo("assets/k8-hotel-logo-white.png","card-brand-logo logo-light"),logo("assets/k8-hotel-logo-dark.png","card-brand-logo logo-dark"));
+    const brandMini=createText("div","brand-mini","K8");
+    const brandWords=document.createElement("div");
+    brandWords.append(
+      createText("div","brand-name","K8智享酒店"),
+      createText("div","card-en","K8 SMART HOTEL")
+    );
+    brand.append(brandMini,brandWords);
     top.append(brand,createText("div","room-tag","SECURE ROOM SERVICE"));
     const main=document.createElement("div");main.className="room-main";main.append(createText("div","room-label","ROOM NUMBER"),createText("div","room-number",room),createText("div","card-title",title));
     const shell=document.createElement("div");shell.className="qr-shell";const qr=document.createElement("div");qr.className="qr";shell.appendChild(qr);
-    const center=document.createElement("div");center.className="qr-logo";center.appendChild(logo("assets/k8-hotel-symbol-dark.png",""));shell.appendChild(center);
+    const center=createText("div","qr-logo","K8");shell.appendChild(center);
     const scan=createText("div","scan-line","微信扫一扫");
     const pills=document.createElement("div");pills.className="service-pills";["客房用品","清洁服务","设备报修","前台咨询"].forEach(x=>pills.appendChild(createText("span","",x)));
     const bottom=document.createElement("div");bottom.className="card-bottom";bottom.append(createText("b","","需求直达前台 · 进度实时查看"),createText("small","","每房专属安全二维码，请勿拍照外传"));

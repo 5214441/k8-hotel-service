@@ -321,73 +321,35 @@ button.ghost{background:#fff;color:var(--muted);border:1px solid var(--line)}
 }
 
 
-/* V4.1 酒店专属 LOGO */
-.hero-logo-box{
-  width:170px;
-  min-width:170px;
-  height:82px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.hero-logo-box img{
-  display:block;
-  width:100%;
-  max-height:78px;
-  object-fit:contain;
-}
-.empty-icon img{
-  display:block;
-  width:46px;
-  height:46px;
-  object-fit:contain;
-}
-.brand-lockup{
-  min-height:52px;
-}
-.card-brand-logo{
-  display:block;
-  width:180px;
-  max-width:72%;
-  height:52px;
-  object-fit:contain;
-  object-position:left center;
-}
-.card-brand-logo.logo-dark{display:none}
-.theme-cream .card-brand-logo.logo-light{display:none}
-.theme-cream .card-brand-logo.logo-dark{display:block}
-.qr-logo{
-  width:48px;
-  height:48px;
-  padding:8px;
-  border-radius:13px;
-  background:#fff;
-  border:5px solid #fff;
-  box-shadow:0 4px 12px rgba(0,0,0,.16);
-}
-.qr-logo img{
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  display:block;
-}
-@media(max-width:680px){
-  .hero-brand{align-items:flex-start}
-  .hero-logo-box{width:125px;min-width:125px;height:62px}
-}
-@media print{
-  .card-brand-logo{
-    width:44mm;
-    max-width:70%;
-    height:12mm;
-  }
-  .qr-logo{
-    width:10mm;
-    height:10mm;
-    padding:1.6mm;
-    border-width:1mm;
-  }
-}
-
 /* V5.1 */
 .check-label span{color:#8e332d}.check-label input{accent-color:#b53a32}
+
+
+/* V5.1 简洁K8标识版 */
+.brand-lockup{
+  min-height:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.qr-logo{
+  width:42px;
+  height:42px;
+  padding:0;
+  border-radius:12px;
+  background:linear-gradient(145deg,#f1d49c,#c7984f);
+  color:#173c35;
+  border:5px solid #fff;
+  font-weight:1000;
+  font-size:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,.14);
+}
+@media print{
+  .qr-logo{
+    width:9mm;
+    height:9mm;
+    padding:0;
+    border-width:1mm;
+    font-size:10px;
+  }
+}
