@@ -7,117 +7,347 @@
     ["设备报修","空调、电视、热水等"],["续住咨询","续住与房价确认"],["退房咨询","退房时间或寄存"],
     ["开票咨询","电子发票或抬头"],["租车服务","经济/商务/SUV/七座"],["其他需求","请在下方说明"]
   ];
-  let selected=new Set(),tracking=null,trackingTimer=null,lastStatus="";
-  const apiReady=()=>/^https:\/\/.+/.test(api)&&!api.includes("请替换");
+
+  let selected=new Set();
+  let tracking=null;
+  let trackingTimer=null;
+  let countdownTimer=null;
+  let currentTicket=null;
+  let lastStatus="";
+  let selectedRating="";
+
   const params=()=>new URLSearchParams(location.search);
-  const queryRoom=()=>params().get("room")||"";
-  const storageKey=room=>"k8_active_ticket_"+room;
-  function toast(msg){const el=$("toast");el.textContent=msg;el.classList.remove("hidden");clearTimeout(window.__toast);window.__toast=setTimeout(()=>el.classList.add("hidden"),1900)}
+  const room=()=>params().get("room")||"";
+  const roomKey=()=>params().get("key")||"";
+  const apiReady=()=>/^https:\/\/.+/.test(api)&&!api.includes("请替换");
+  const storageKey=()=>`k8_v5_ticket_${room()}`;
+
+  function toast(msg){
+    const el=$("toast");
+    el.textContent=msg;
+    el.classList.remove("hidden");
+    clearTimeout(window.__toast);
+    window.__toast=setTimeout(()=>el.classList.add("hidden"),2400);
+  }
+
+  function formatTime(value){
+    if(!value)return "—";
+    return new Date(value).toLocaleString("zh-CN",{month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false});
+  }
+
   function render(){
     document.title=(config.hotelName||"酒店")+" · 住客服务";
-    $("hotelName").textContent=config.hotelName||"酒店";
-    const room=queryRoom();$("roomNo").textContent=room||"未识别";$("roomInput").value=room;
+    $("roomNo").textContent=room()||"未识别";
+    $("roomInput").value=room();
     $("hotelAddress").textContent=config.address||"请咨询前台";
     $("wifiText").textContent=config.wifiText||"请咨询前台";
     $("checkoutText").textContent=config.checkOutText||"请咨询前台";
+
+    if(config.frontDeskPhone){
+      $("phoneBox").classList.remove("hidden");
+      $("phoneLink").href="tel:"+config.frontDeskPhone;
+      $("phoneLink").textContent="紧急需求请拨打前台："+config.frontDeskPhone;
+    }
+
     services.forEach(([name,desc])=>{
-      const b=document.createElement("button");b.className="service-chip";b.type="button";
-      b.innerHTML="<b>"+name+"</b><small>"+desc+"</small>";
-      b.onclick=()=>{selected.has(name)?selected.delete(name):selected.add(name);b.classList.toggle("selected",selected.has(name))};
-      $("serviceGrid").appendChild(b);
+      const button=document.createElement("button");
+      button.className="service-chip";
+      button.type="button";
+      button.innerHTML=`<b>${name}</b><small>${desc}</small>`;
+      button.onclick=()=>{
+        selected.has(name)?selected.delete(name):selected.add(name);
+        button.classList.toggle("selected",selected.has(name));
+      };
+      $("serviceGrid").appendChild(button);
     });
-    (config.rentalPrices||[]).forEach(x=>{
-      const d=document.createElement("div");d.className="rental-card";
-      d.innerHTML="<b>"+x.name+"</b><strong>"+x.price+"</strong><small>"+x.note+"</small>";
-      d.onclick=()=>{selected.add("租车服务-"+x.name+" "+x.price);toast("已选择 "+x.name)};
-      $("rentalGrid").appendChild(d);
+
+    (config.rentalPrices||[]).forEach(item=>{
+      const card=document.createElement("div");
+      card.className="rental-card";
+      card.innerHTML=`<b>${item.name}</b><strong>${item.price}</strong><small>${item.note}</small>`;
+      card.onclick=()=>{
+        selected.add(`租车服务-${item.name} ${item.price}`);
+        toast("已选择 "+item.name);
+      };
+      $("rentalGrid").appendChild(card);
     });
+
     if(!apiReady())$("apiWarning").classList.remove("hidden");
-    restoreTracking();
+    if(!room()||!roomKey()){
+      $("invalidQr").classList.remove("hidden");
+      $("submitRequest").disabled=true;
+    }else{
+      restoreTracking();
+    }
+
+    updateNetwork();
   }
+
+  function updateNetwork(){
+    $("offlineBanner").classList.toggle("hidden",navigator.onLine);
+  }
+
+  function saveTracking(value){
+    tracking=value;
+    localStorage.setItem(storageKey(),JSON.stringify(value));
+    const p=params();
+    p.set("room",room());
+    p.set("key",roomKey());
+    p.set("ticket",value.id);
+    p.set("track",value.token);
+    history.replaceState(null,"",location.pathname+"?"+p.toString());
+  }
+
   function restoreTracking(){
-    const p=params(),room=queryRoom();
-    const fromUrl=p.get("ticket")&&p.get("track")?{id:p.get("ticket"),token:p.get("track"),room}:null;
-    let saved=null;try{saved=JSON.parse(localStorage.getItem(storageKey(room))||"null")}catch(e){}
+    const p=params();
+    const fromUrl=p.get("ticket")&&p.get("track")
+      ?{id:p.get("ticket"),token:p.get("track")}
+      :null;
+    let saved=null;
+    try{saved=JSON.parse(localStorage.getItem(storageKey())||"null")}catch{}
     tracking=fromUrl||saved;
-    if(tracking&&tracking.id&&tracking.token){
+
+    if(tracking?.id&&tracking?.token){
       showTracking();
       pollStatus(true);
       return;
     }
-    restoreLatestByRoom(room);
+    restoreActive();
   }
 
-  async function restoreLatestByRoom(room){
-    if(!room||!apiReady())return;
+  async function restoreActive(){
     try{
-      const res=await fetch(api+"/api/rooms/"+encodeURIComponent(room)+"/latest",{cache:"no-store"});
+      const res=await fetch(`${api}/api/rooms/${encodeURIComponent(room())}/active?key=${encodeURIComponent(roomKey())}`,{cache:"no-store"});
       if(res.status===404)return;
       const data=await res.json().catch(()=>({}));
-      if(!res.ok)throw new Error(data.message||"恢复进度失败");
+      if(!res.ok)throw new Error(data.message||"恢复工单失败");
       const t=data.ticket;
-      if(!t||!t.id||!t.guest_token)return;
-      saveTracking({id:t.id,token:t.guest_token,room});
+      saveTracking({id:t.id,token:t.guest_token});
       showTracking();
-      updateTrackingView(t);
-      $("activeTicketPanel").scrollIntoView({behavior:"smooth",block:"start"});
-    }catch(e){
-      console.warn("未能自动恢复工单进度",e);
+      updateTracking(t);
+    }catch(error){
+      if(error.message.includes("二维码")){
+        $("invalidQr").classList.remove("hidden");
+        $("submitRequest").disabled=true;
+      }
     }
   }
-  function saveTracking(t){
-    tracking=t;localStorage.setItem(storageKey(t.room),JSON.stringify(t));
-    const p=params();p.set("room",t.room);p.set("ticket",t.id);p.set("track",t.token);
-    history.replaceState(null,"",location.pathname+"?"+p.toString());
-  }
-  function clearTracking(){
-    if(tracking&&tracking.room)localStorage.removeItem(storageKey(tracking.room));
-    tracking=null;lastStatus="";clearInterval(trackingTimer);trackingTimer=null;
-    $("activeTicketPanel").classList.add("hidden");$("requestForm").classList.remove("hidden");
-    const p=params();p.delete("ticket");p.delete("track");history.replaceState(null,"",location.pathname+"?"+p.toString());
-    resetForm();scrollTo({top:0,behavior:"smooth"});
-  }
-  function resetForm(){selected.clear();document.querySelectorAll(".service-chip.selected").forEach(x=>x.classList.remove("selected"));$("remark").value="";$("guestName").value="";$("submitRequest").disabled=false;$("submitRequest").textContent="立即提交给前台"}
+
   function showTracking(){
-    $("requestForm").classList.add("hidden");$("activeTicketPanel").classList.remove("hidden");$("trackingTicketId").textContent=tracking.id;
-    clearInterval(trackingTimer);trackingTimer=setInterval(()=>pollStatus(true),(config.pollSeconds||4)*1000);
+    $("requestForm").classList.add("hidden");
+    $("activeTicketPanel").classList.remove("hidden");
+    $("trackingTicketId").textContent=tracking.id;
+    clearInterval(trackingTimer);
+    trackingTimer=setInterval(()=>pollStatus(true),(config.pollSeconds||4)*1000);
   }
+
   function setSteps(status){
     ["stepSubmitted","stepAccepted","stepProcessing","stepCompleted"].forEach(id=>$(id).classList.remove("active"));
     $("stepSubmitted").classList.add("active");
-    if(["accepted","completed"].includes(status)){$("stepAccepted").classList.add("active");$("stepProcessing").classList.add("active")}
+    if(["accepted","completed"].includes(status)){
+      $("stepAccepted").classList.add("active");
+      $("stepProcessing").classList.add("active");
+    }
     if(status==="completed")$("stepCompleted").classList.add("active");
   }
-  function updateTrackingView(t){
+
+  function startCountdown(ticket){
+    clearInterval(countdownTimer);
+    const renderCountdown=()=>{
+      if(!ticket.eta_deadline){
+        $("etaText").textContent=ticket.eta_minutes?`预计约 ${ticket.eta_minutes} 分钟内处理`:"";
+        $("etaText").classList.remove("eta-overdue");
+        return;
+      }
+      const remain=Math.ceil((new Date(ticket.eta_deadline).getTime()-Date.now())/60000);
+      if(remain>0){
+        $("etaText").textContent=`预计约 ${ticket.eta_minutes||remain} 分钟内处理 · 剩余约 ${remain} 分钟`;
+        $("etaText").classList.remove("eta-overdue");
+      }else{
+        $("etaText").textContent="预计时间已到，前台正在继续处理";
+        $("etaText").classList.add("eta-overdue");
+      }
+    };
+    renderCountdown();
+    countdownTimer=setInterval(renderCountdown,30000);
+  }
+
+  function updateTracking(t){
+    currentTicket=t;
     const map={
       new:{label:"已提交",cls:"status-new",title:"前台正在查看您的需求",msg:"请稍候，前台接单后这里会自动更新。"},
-      accepted:{label:"前台已接单",cls:"status-accepted",title:(t.accepted_by||"前台")+"正在处理",msg:"工作人员已经收到并开始安排，请您稍候。"},
-      completed:{label:"已完成",cls:"status-completed",title:"您的需求已处理完成",msg:"感谢您的耐心等待。仍有需要可继续提交新需求。"},
-      cancelled:{label:"已取消",cls:"status-cancelled",title:"该服务单已取消",msg:"有需要请重新提交或直接联系前台。"}
+      accepted:{label:"前台已接单",cls:"status-accepted",title:"前台正在处理",msg:"工作人员已经收到并开始安排。"},
+      completed:{label:"已完成",cls:"status-completed",title:"前台已标记处理完成",msg:"请确认本次需求是否已经解决。"},
+      cancelled:{label:"已取消",cls:"status-cancelled",title:"该服务单已取消",msg:"仍有需要请重新提交或直接联系前台。"}
     };
-    const s=map[t.status]||map.new,b=$("trackingStatus");b.className="status-badge "+s.cls;b.textContent=s.label;
-    $("trackingTitle").textContent=s.title;$("trackingMessage").textContent=s.msg;$("trackingTicketId").textContent=t.id;setSteps(t.status);
-    if(t.staff_reply){$("staffReplyBox").classList.remove("hidden");$("staffReply").textContent=t.staff_reply;$("etaText").textContent=t.eta_minutes?("预计约 "+t.eta_minutes+" 分钟内处理"):""}else $("staffReplyBox").classList.add("hidden");
+    const state=map[t.status]||map.new;
+    const badge=$("trackingStatus");
+    badge.className="status-badge "+state.cls;
+    badge.textContent=state.label;
+    $("trackingTitle").textContent=state.title;
+    $("trackingMessage").textContent=state.msg;
+    $("trackingTicketId").textContent=t.id;
+    $("detailServices").textContent=(t.services||[]).join("、")||"其他需求";
+    $("detailRemark").textContent=t.remark||"无";
+    $("detailCreated").textContent=formatTime(t.created_at);
+    setSteps(t.status);
+
+    if(t.staff_reply){
+      $("staffReplyBox").classList.remove("hidden");
+      $("staffReply").textContent=t.staff_reply;
+      startCountdown(t);
+    }else{
+      $("staffReplyBox").classList.add("hidden");
+      clearInterval(countdownTimer);
+    }
+
+    const needsResolution=t.status==="completed"&&t.guest_resolution!=="resolved";
+    $("resolutionBox").classList.toggle("hidden",!needsResolution);
+
+    const canRate=t.status==="completed"&&t.guest_resolution==="resolved";
+    $("ratingBox").classList.toggle("hidden",!canRate);
+    if(canRate){
+      if(t.rating){
+        const labels={satisfied:"满意",average:"一般",unsatisfied:"不满意"};
+        $("ratingChoices").classList.add("hidden");
+        $("ratingComment").classList.add("hidden");
+        $("submitRating").classList.add("hidden");
+        $("ratingDone").classList.remove("hidden");
+        $("ratingDone").textContent=`评价已提交：${labels[t.rating]||t.rating}${t.rating_comment?"；"+t.rating_comment:""}`;
+      }else{
+        $("ratingChoices").classList.remove("hidden");
+        $("ratingComment").classList.remove("hidden");
+        $("submitRating").classList.remove("hidden");
+        $("ratingDone").classList.add("hidden");
+      }
+    }
+
+    $("remindBtn").classList.toggle("hidden",!["new","accepted"].includes(t.status));
     $("closeTracking").classList.toggle("hidden",!["completed","cancelled"].includes(t.status));
-    $("trackingSync").textContent="更新于 "+new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
-    if(lastStatus&&lastStatus!==t.status)toast(t.status==="accepted"?"前台已接单":t.status==="completed"?"服务已完成":"进度已更新");lastStatus=t.status;
+    $("trackingSync").textContent="更新于 "+new Date().toLocaleTimeString("zh-CN",{hour12:false});
+
+    if(lastStatus&&lastStatus!==t.status){
+      toast(t.status==="accepted"?"前台已接单":t.status==="completed"?"服务已完成":"进度已更新");
+    }
+    lastStatus=t.status;
   }
+
   async function pollStatus(silent=false){
     if(!tracking||!apiReady())return;
     try{
-      const res=await fetch(api+"/api/tickets/"+encodeURIComponent(tracking.id)+"/status?token="+encodeURIComponent(tracking.token),{cache:"no-store"});
-      const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||"查询进度失败");updateTrackingView(data.ticket);
-    }catch(e){$("trackingSync").textContent="暂时无法更新";if(!silent)toast(e.message||"查询失败")}
+      const res=await fetch(`${api}/api/tickets/${encodeURIComponent(tracking.id)}/status?token=${encodeURIComponent(tracking.token)}`,{cache:"no-store"});
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok)throw new Error(data.message||"查询进度失败");
+      updateTracking(data.ticket);
+    }catch(error){
+      $("trackingSync").textContent="暂时无法更新";
+      if(!silent)toast(error.message||"查询失败");
+    }
   }
+
   async function submit(){
-    const room=$("roomInput").value.trim().replace(/[^\w\u4e00-\u9fa5-]/g,"");const remark=$("remark").value.trim();
-    if(!room){toast("请填写房间号");$("roomInput").focus();return}if(!selected.size&&!remark){toast("请选择服务或填写需求");return}if(!apiReady()){toast("系统尚未连接前台");return}
-    const btn=$("submitRequest");btn.disabled=true;btn.textContent="正在通知前台…";
+    const remark=$("remark").value.trim();
+    if(!selected.size&&!remark){toast("请选择服务或填写需求");return}
+    if(!apiReady()){toast("系统尚未连接前台");return}
+    if(!room()||!roomKey()){toast("请重新扫描房间二维码");return}
+
+    const btn=$("submitRequest");
+    btn.disabled=true;
+    btn.textContent="正在通知前台…";
+
     try{
-      const res=await fetch(api+"/api/tickets",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({room,services:[...selected],remark,guestName:$("guestName").value.trim()})});
-      const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.message||"提交失败");
-      saveTracking({id:data.ticket.id,token:data.ticket.guest_token,room});showTracking();updateTrackingView(data.ticket);$("activeTicketPanel").scrollIntoView({behavior:"smooth",block:"start"});btn.textContent="已提交";
-    }catch(e){toast(e.message||"网络异常，请稍后重试");btn.disabled=false;btn.textContent="立即提交给前台"}
+      const res=await fetch(api+"/api/tickets",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          room:room(),
+          roomKey:roomKey(),
+          services:[...selected],
+          remark,
+          guestName:$("guestName").value.trim()
+        })
+      });
+      const data=await res.json().catch(()=>({}));
+      if(res.status===409&&data.code==="ACTIVE_EXISTS"&&data.ticket){
+        saveTracking({id:data.ticket.id,token:data.ticket.guest_token});
+        showTracking();
+        updateTracking(data.ticket);
+        toast("本房间已有未完成工单，已打开当前进度");
+        return;
+      }
+      if(!res.ok)throw new Error(data.message||"提交失败");
+      saveTracking({id:data.ticket.id,token:data.ticket.guest_token});
+      showTracking();
+      updateTracking(data.ticket);
+      $("activeTicketPanel").scrollIntoView({behavior:"smooth",block:"start"});
+    }catch(error){
+      toast(error.message||"网络异常，请稍后重试");
+      btn.disabled=false;
+      btn.textContent="立即提交给前台";
+    }
   }
-  $("submitRequest").onclick=submit;$("refreshStatus").onclick=()=>pollStatus(false);$("closeTracking").onclick=clearTracking;render();
+
+  async function guestAction(action,extra={}){
+    if(!tracking)return;
+    try{
+      const res=await fetch(`${api}/api/tickets/${encodeURIComponent(tracking.id)}/guest`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({token:tracking.token,action,...extra})
+      });
+      const data=await res.json().catch(()=>({}));
+      if(!res.ok)throw new Error(data.message||"操作失败");
+      toast(
+        action==="remind"?"已提醒前台":
+        action==="resolved"?"感谢您的确认，请评价本次服务":
+        action==="rate"?"感谢您的评价":
+        "已重新通知前台继续处理"
+      );
+      await pollStatus(true);
+    }catch(error){
+      toast(error.message||"操作失败");
+    }
+  }
+
+  function closeTracking(){
+    localStorage.removeItem(storageKey());
+    tracking=null;
+    currentTicket=null;
+    lastStatus="";
+    clearInterval(trackingTimer);
+    clearInterval(countdownTimer);
+    $("activeTicketPanel").classList.add("hidden");
+    $("requestForm").classList.remove("hidden");
+    const p=params();
+    p.delete("ticket");p.delete("track");
+    history.replaceState(null,"",location.pathname+"?"+p.toString());
+    selected.clear();
+    document.querySelectorAll(".service-chip.selected").forEach(x=>x.classList.remove("selected"));
+    $("remark").value="";
+    $("guestName").value="";
+    $("submitRequest").disabled=false;
+    $("submitRequest").textContent="立即提交给前台";
+    scrollTo({top:0,behavior:"smooth"});
+  }
+
+  document.querySelectorAll("#ratingChoices button").forEach(button=>{
+    button.onclick=()=>{
+      selectedRating=button.dataset.rating;
+      document.querySelectorAll("#ratingChoices button").forEach(x=>x.classList.toggle("selected",x===button));
+    };
+  });
+  $("submitRating").onclick=()=>{
+    if(!selectedRating){toast("请选择满意、一般或不满意");return}
+    guestAction("rate",{rating:selectedRating,comment:$("ratingComment").value.trim()});
+  };
+
+  $("submitRequest").onclick=submit;
+  $("refreshStatus").onclick=()=>pollStatus(false);
+  $("remindBtn").onclick=()=>guestAction("remind");
+  $("resolvedBtn").onclick=()=>guestAction("resolved");
+  $("unresolvedBtn").onclick=()=>guestAction("unresolved");
+  $("closeTracking").onclick=closeTracking;
+  window.addEventListener("online",()=>{updateNetwork();pollStatus(true)});
+  window.addEventListener("offline",updateNetwork);
+  render();
 })();

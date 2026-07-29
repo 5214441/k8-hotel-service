@@ -5,23 +5,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#173c35">
   <meta name="description" content="K8智享酒店住客服务">
-  <link rel="stylesheet" href="style.css?v=3.2">
+  <link rel="stylesheet" href="style.css?v=5.1">
   <title>K8智享酒店 · 住客服务</title>
 </head>
 <body>
   <main class="page-shell">
     <header class="hero">
-      <div class="brand-row">
-        <div class="brand-mark">K8</div>
-        <div><p class="eyebrow">GUEST SERVICE</p><h1 id="hotelName">K8智享酒店</h1></div>
-      </div>
+      <img class="guest-logo" src="assets/k8-hotel-logo-white.png" alt="K8智享酒店">
       <div class="room-pill">当前房间 <strong id="roomNo">未识别</strong></div>
-      <p class="hero-copy">选择需要的服务并提交，前台接单和处理进度会实时显示在本页面。</p>
+      <p class="hero-copy">选择服务并提交，前台接单、预计时间和处理结果都会持续显示在本页面。</p>
     </header>
 
-    <section class="notice-card">
-      <span class="notice-icon">✓</span>
-      <div><strong>需求直接发送到前台电脑</strong><p>提交后请保留本页面，系统会自动更新接单状态和前台回复。</p></div>
+    <section id="offlineBanner" class="offline-banner hidden">当前网络不可用，恢复网络后系统会自动重试。</section>
+    <section id="invalidQr" class="invalid-qr hidden">
+      <b>二维码无效或缺少房间凭证</b>
+      <p>请重新扫描房间内正式二维码，或直接联系前台。</p>
     </section>
 
     <section id="activeTicketPanel" class="panel tracking-panel hidden" aria-live="polite">
@@ -46,19 +44,54 @@
         <div id="stepCompleted" class="timeline-step"><i>4</i><span>已完成</span></div>
       </div>
 
+      <div class="request-detail">
+        <b>本次提交内容</b>
+        <div><span>服务</span><strong id="detailServices">—</strong></div>
+        <div><span>备注</span><strong id="detailRemark">—</strong></div>
+        <div><span>提交时间</span><strong id="detailCreated">—</strong></div>
+      </div>
+
       <div id="staffReplyBox" class="staff-reply hidden">
         <div class="reply-label">前台回复</div>
         <p id="staffReply"></p>
         <small id="etaText"></small>
       </div>
 
+      <div id="resolutionBox" class="resolution-box hidden">
+        <b>本次需求是否已经解决？</b>
+        <div>
+          <button id="resolvedBtn" class="resolved-btn">已经解决</button>
+          <button id="unresolvedBtn" class="unresolved-btn">仍未解决</button>
+        </div>
+      </div>
+
+
+      <div id="ratingBox" class="rating-box hidden">
+        <b>请评价本次服务</b>
+        <p>您的评价将用于改善酒店服务。</p>
+        <div id="ratingChoices" class="rating-choices">
+          <button type="button" data-rating="satisfied">满意</button>
+          <button type="button" data-rating="average">一般</button>
+          <button type="button" data-rating="unsatisfied">不满意</button>
+        </div>
+        <textarea id="ratingComment" maxlength="200" rows="3" placeholder="可填写评价留言（选填）"></textarea>
+        <button id="submitRating" class="rating-submit" type="button">提交评价</button>
+        <div id="ratingDone" class="rating-done hidden"></div>
+      </div>
+
       <div class="tracking-actions">
-        <button id="refreshStatus" class="secondary-btn">立即刷新进度</button>
+        <button id="refreshStatus" class="secondary-btn">立即刷新</button>
+        <button id="remindBtn" class="secondary-btn hidden">提醒前台</button>
         <button id="closeTracking" class="ghost-btn hidden">关闭并提交新需求</button>
       </div>
     </section>
 
     <section id="requestForm">
+      <section class="notice-card">
+        <span class="notice-icon">✓</span>
+        <div><strong>需求直接发送到前台电脑</strong><p>提交后再次扫码，也能安全找回当前未完成工单。</p></div>
+      </section>
+
       <section class="panel">
         <div class="section-head"><div><span>01</span><h2>选择服务</h2></div><small>可多选</small></div>
         <div id="serviceGrid" class="service-grid"></div>
@@ -66,10 +99,10 @@
 
       <section class="panel">
         <div class="section-head"><div><span>02</span><h2>补充说明</h2></div><small>选填</small></div>
-        <textarea id="remark" rows="4" maxlength="200" placeholder="例如：需要两瓶水；空调不制冷；预计续住一天……"></textarea>
+        <textarea id="remark" rows="4" maxlength="300" placeholder="例如：需要两瓶水；空调不制冷；物品放门口即可……"></textarea>
         <div class="field-row">
-          <label>房间号<input id="roomInput" inputmode="numeric" maxlength="12" placeholder="例如 608"></label>
-          <label>称呼<input id="guestName" maxlength="20" placeholder="例如 李先生（选填）"></label>
+          <label>房间号<input id="roomInput" readonly></label>
+          <label>称呼<input id="guestName" maxlength="30" placeholder="例如 李先生（选填）"></label>
         </div>
         <button id="submitRequest" class="primary-btn">立即提交给前台</button>
         <p id="apiWarning" class="api-warning hidden">系统尚未连接前台工单服务，请联系酒店管理员。</p>
@@ -88,12 +121,16 @@
         <div><b>退房</b><span id="checkoutText"></span></div>
         <div><b>地址</b><span id="hotelAddress"></span></div>
       </div>
+      <div id="phoneBox" class="phone-box hidden">
+        <a id="phoneLink" href="#">紧急需求请直接拨打前台</a>
+      </div>
+      <p class="emergency-note">医疗、消防、人身安全等紧急情况，请立即联系前台或当地紧急服务，本页面不适用于紧急求助。</p>
     </section>
 
-    <footer><b>K8智享酒店</b><span>祝您入住愉快</span></footer>
+    <footer><b>K8智享酒店</b><span>住客服务系统 V5.1</span></footer>
   </main>
   <div id="toast" class="toast hidden"></div>
-  <script src="config.js?v=3.2"></script>
-  <script src="app.js?v=3.2"></script>
+  <script src="config.js?v=5.1"></script>
+  <script src="app.js?v=5.1"></script>
 </body>
 </html>

@@ -92,3 +92,71 @@ button,input,textarea{font:inherit}.page-shell{max-width:760px;margin:auto;paddi
   .timeline-step i{width:38px;height:38px}
   .timeline:before{top:18px}
 }
+
+/* V5.0 */
+.guest-logo{display:block;width:220px;max-width:72%;height:85px;object-fit:contain;object-position:left center}
+.offline-banner,.invalid-qr{margin-top:14px;padding:14px 16px;border-radius:14px}
+.offline-banner{background:#fff3cd;color:#795a00;border:1px solid #ead18a}
+.invalid-qr{background:#fff0f0;color:#9e2929;border:1px solid #efbaba}
+.invalid-qr p{margin:5px 0 0}
+.request-detail{margin-top:16px;padding:15px;border-radius:14px;background:#f3f6f4;border:1px solid #e0e8e4}
+.request-detail>b{display:block;margin-bottom:9px}
+.request-detail>div{display:flex;gap:12px;justify-content:space-between;padding:7px 0;border-top:1px dashed #d9e2de}
+.request-detail>div:first-of-type{border-top:0}
+.request-detail span{color:var(--muted);min-width:70px}
+.request-detail strong{text-align:right;line-height:1.5}
+.resolution-box{margin-top:16px;padding:17px;border-radius:14px;background:#fff8e7;border:1px solid #e9d39d;text-align:center}
+.resolution-box>b{display:block;margin-bottom:12px}
+.resolution-box>div{display:flex;gap:10px}
+.resolution-box button{flex:1;border:0;border-radius:12px;padding:13px;font-weight:900}
+.resolved-btn{background:#19734f;color:#fff}.unresolved-btn{background:#fff;color:#a33b32;border:1px solid #e3b0aa!important}
+.phone-box{margin-top:15px}.phone-box a{display:block;text-align:center;padding:14px;border-radius:13px;background:var(--green2);color:#fff;text-decoration:none;font-weight:900}
+.emergency-note{font-size:12px;color:#8b5a37;line-height:1.7;margin:14px 0 0}
+.eta-overdue{color:#b32d2d!important;font-weight:900}
+@media(max-width:600px){.guest-logo{width:180px;height:70px}.resolution-box>div{flex-direction:column}}
+
+
+/* V5.1 服务评价 */
+.rating-box{
+  margin-top:16px;
+  padding:18px;
+  border-radius:15px;
+  background:#f6f2ff;
+  border:1px solid #d8cbed;
+}
+.rating-box>b{display:block;font-size:18px}
+.rating-box>p{margin:5px 0 13px;color:var(--muted);font-size:13px}
+.rating-choices{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.rating-choices button{
+  border:1px solid #d8d2df;
+  border-radius:12px;
+  padding:13px 8px;
+  background:#fff;
+  color:var(--text);
+  font-weight:900;
+}
+.rating-choices button.selected{
+  border-color:var(--green2);
+  background:#e7f3ee;
+  color:var(--green);
+  box-shadow:0 0 0 2px rgba(36,88,78,.12);
+}
+.rating-box textarea{margin-top:11px}
+.rating-submit{
+  width:100%;
+  margin-top:10px;
+  border:0;
+  border-radius:12px;
+  padding:13px;
+  background:var(--green2);
+  color:#fff;
+  font-weight:900;
+}
+.rating-done{
+  padding:14px;
+  border-radius:12px;
+  background:#e0f3e8;
+  color:#176947;
+  text-align:center;
+  font-weight:900;
+}

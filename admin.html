@@ -6,12 +6,15 @@
   <meta name="theme-color" content="#102a43">
   <meta name="description" content="K8智享酒店前台服务工单台">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="admin.css?v=3.3">
+  <link rel="stylesheet" href="admin.css?v=5.1">
   <title>K8酒店 · 前台工单台</title>
 </head>
 <body>
   <header class="topbar">
-    <div><span class="logo">K8</span><div><h1>前台服务工单台</h1><p id="clock">正在同步时间</p></div></div>
+    <div class="admin-brand">
+      <img src="assets/k8-hotel-logo-white.png" alt="K8智享酒店">
+      <div><h1>前台服务工单台</h1><p id="clock">正在同步时间</p></div>
+    </div>
     <div class="top-actions">
       <span id="networkBadge" class="badge ok">在线</span>
       <button id="soundBtn" class="btn">开启声音提醒</button>
@@ -26,28 +29,73 @@
       <span>处理中 <b id="acceptedCount">0</b></span>
       <span>今日完成 <b id="doneCount">0</b></span>
       <span>平均响应 <b id="avgResponse">—</b></span>
+      <span>平均完成 <b id="avgComplete">—</b></span>
+      <span>未解决 <b id="unresolvedCount">0</b></span>
+      <span>今日满意率 <b id="satisfactionRate">—</b></span>
+      <span>不满意评价 <b id="badRatingCount">0</b></span>
     </div>
-    <button id="logoutBtn" class="link-btn">退出管理</button>
+    <div class="duty-actions">
+      <button id="historyBtn" class="history-btn">历史工单</button>
+      <button id="logoutBtn" class="link-btn">退出管理</button>
+    </div>
   </section>
 
   <main class="board">
     <section class="column new-column">
-      <div class="column-head"><h2>🔴 新工单</h2><small>接单时可直接回复客人</small></div>
+      <div class="column-head"><h2>🔴 新工单</h2><small>超过5分钟开始提醒</small></div>
       <div id="newList" class="ticket-list"></div>
     </section>
     <section class="column">
-      <div class="column-head"><h2>🟡 处理中</h2><small>可更新预计时间和回复</small></div>
+      <div class="column-head"><h2>🟡 处理中</h2><small>预计时间自动倒计时</small></div>
       <div id="acceptedList" class="ticket-list"></div>
     </section>
     <section class="column">
-      <div class="column-head"><h2>🟢 今日已完成</h2><small>总耗时固定，不再继续增长</small></div>
+      <div class="column-head"><h2>🟢 今日已完成</h2><small>5分钟内可撤销完成</small></div>
       <div id="doneList" class="ticket-list"></div>
     </section>
   </main>
 
+  <section id="historyPanel" class="history-overlay hidden">
+    <div class="history-dialog">
+      <div class="history-head">
+        <div><h2>历史工单查询</h2><p>服务器分页查询，不再限制最近300条。</p></div>
+        <button id="historyClose" class="history-close">×</button>
+      </div>
+      <div class="history-filters">
+        <label>开始日期<input id="historyFrom" type="date"></label>
+        <label>结束日期<input id="historyTo" type="date"></label>
+        <label>房间号<input id="historyRoom" placeholder="例如 608"></label>
+        <label>状态<select id="historyStatus"><option value="">全部</option><option value="new">新工单</option><option value="accepted">处理中</option><option value="completed">已完成</option><option value="cancelled">已取消</option></select></label>
+        <label class="history-keyword">关键词<input id="historyKeyword" placeholder="服务、备注、称呼、回复或工单号"></label>
+      </div>
+      <div class="history-actions">
+        <button id="historySearch" class="history-primary">查询</button>
+        <button id="historyReset" class="history-secondary">重置</button>
+        <button id="historyExport" class="history-secondary">导出本页CSV</button>
+        <span id="historyResultCount" class="history-count">尚未查询</span>
+      </div>
+      <div id="historyResults" class="history-results"></div>
+      <div class="history-pagination">
+        <button id="historyPrev">上一页</button>
+        <span id="historyPage">第1页</span>
+        <button id="historyNext">下一页</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="eventPanel" class="history-overlay hidden">
+    <div class="event-dialog">
+      <div class="history-head">
+        <div><h2>工单操作记录</h2><p id="eventTicketId"></p></div>
+        <button id="eventClose" class="history-close">×</button>
+      </div>
+      <div id="eventList" class="event-list"></div>
+    </div>
+  </section>
+
   <div id="loginOverlay" class="overlay">
     <form id="loginForm" class="login-card">
-      <div class="login-logo">K8</div>
+      <img class="login-brand-logo" src="assets/k8-hotel-logo-dark.png" alt="K8智享酒店">
       <h2>前台工单台登录</h2>
       <p>请输入部署时设置的管理密码。</p>
       <input id="passwordInput" type="password" autocomplete="current-password" placeholder="管理密码" required>
@@ -58,7 +106,7 @@
   </div>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="config.js?v=3.3"></script>
-  <script src="admin.js?v=3.3"></script>
+  <script src="config.js?v=5.1"></script>
+  <script src="admin.js?v=5.1"></script>
 </body>
 </html>

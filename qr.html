@@ -4,92 +4,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#173c35">
-  <title>K8酒店 · 美化房间二维码生成器</title>
-  <link rel="stylesheet" href="qr.css?v=4.0">
+  <title>K8酒店 · 安全二维码生成器 V5.1</title>
+  <link rel="stylesheet" href="qr.css?v=5.1">
 </head>
 <body>
   <main class="generator-shell">
     <header class="hero">
       <div class="hero-brand">
-        <div class="hero-logo">K8</div>
-        <div>
-          <p class="eyebrow">ROOM SERVICE QR DESIGNER</p>
-          <h1>房间二维码美化生成器</h1>
-          <p class="hero-copy">批量生成带酒店品牌、房号和扫码指引的客房服务立牌。</p>
-        </div>
+        <div class="hero-logo-box"><img src="assets/k8-hotel-logo-white.png" alt="K8智享酒店"></div>
+        <div><p class="eyebrow">SECURE ROOM SERVICE QR</p><h1>安全房间二维码生成器</h1><p class="hero-copy">每个房间生成独立密钥，防止手动修改房号伪造工单。</p></div>
       </div>
-      <div class="hero-note">A4打印自动排版 · 每页4张</div>
+      <div class="hero-note">正式运营版 V5.1</div>
     </header>
 
     <section class="controls">
-      <div class="control-head">
-        <div>
-          <h2>生成设置</h2>
-          <p>原房间网址不变，只美化二维码外观。</p>
-        </div>
-        <span class="version">美化版 V4</span>
-      </div>
-
+      <div class="control-head"><div><h2>生成设置</h2><p>首次打印前，请先完成数据库和Worker升级。</p></div><span class="version">每房独立密钥</span></div>
       <div class="form-grid">
-        <label>
-          酒店名称
-          <input id="hotelName" maxlength="30" value="K8智享酒店">
-        </label>
-
-        <label>
-          卡片主题
-          <select id="theme">
-            <option value="emerald">墨绿香槟金</option>
-            <option value="cream">奶油暖金</option>
-            <option value="midnight">深蓝铂金</option>
-          </select>
-        </label>
-
-        <label class="full">
-          住客服务网址
-          <input id="baseUrl" value="https://5214441.github.io/k8-hotel-service/">
-        </label>
-
-        <label class="full">
-          房号（换行、空格、逗号均可）
-          <textarea id="rooms" rows="6" placeholder="例如：&#10;201 202 203 205&#10;301 302 303 305"></textarea>
-        </label>
-
-        <label>
-          主标题
-          <input id="cardTitle" maxlength="16" value="专属住客服务">
-        </label>
-
-        <label class="check-label">
-          <input id="showLogo" type="checkbox" checked>
-          <span>二维码中央显示 K8 标识</span>
-        </label>
+        <label>管理密码<input id="adminPassword" type="password" placeholder="Cloudflare ADMIN_PASSWORD"></label>
+        <label>卡片主题<select id="theme"><option value="emerald">墨绿香槟金</option><option value="cream">奶油暖金</option><option value="midnight">深蓝铂金</option></select></label>
+        <label class="full">住客服务网址<input id="baseUrl" value="https://5214441.github.io/k8-hotel-service/"></label>
+        <label class="full">房号（换行、空格、逗号均可）<textarea id="rooms" rows="7" placeholder="201 202 203&#10;301 302 303"></textarea></label>
+        <label>主标题<input id="cardTitle" value="专属住客服务"></label>
+        <label class="check-label"><input id="rotateKeys" type="checkbox"><span>重新生成房间密钥（旧二维码立即失效）</span></label>
       </div>
-
-      <div class="button-row">
-        <button id="generate" class="primary">生成美化二维码</button>
-        <button id="print" class="secondary">打印全部</button>
-        <button id="clear" class="ghost">清空房号</button>
-      </div>
-
-      <div class="print-tip">
-        打印建议：选择 A4、纵向、缩放100%，并开启“背景图形”。正式制作前先打印一张测试扫码。
-      </div>
+      <div class="button-row"><button id="generate" class="primary">生成安全二维码</button><button id="print" class="secondary">打印全部</button><button id="clear" class="ghost">清空</button></div>
+      <div class="print-tip">首次生成不要勾选“重新生成密钥”。正式打印后也不要随意重新生成，否则旧二维码会失效。</div>
     </section>
-
-    <section id="emptyState" class="empty-state">
-      <div class="empty-icon">QR</div>
-      <h2>输入房号后生成</h2>
-      <p>生成后可直接打印成客房桌面立牌或墙面贴牌。</p>
-    </section>
-
+    <section id="emptyState" class="empty-state"><div class="empty-icon"><img src="assets/k8-hotel-symbol-dark.png" alt=""></div><h2>输入房号后生成</h2><p>生成的网址会包含 room 和 key 两个参数。</p></section>
     <section id="cards" class="cards"></section>
   </main>
-
   <div id="toast" class="toast hidden"></div>
-
-  <script src="config.js?v=4.0"></script>
+  <script src="config.js?v=5.1"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="qr.js?v=4.0"></script>
+  <script src="qr.js?v=5.1"></script>
 </body>
 </html>
