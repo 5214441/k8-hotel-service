@@ -15,6 +15,7 @@
   let currentTicket=null;
   let lastStatus="";
   let selectedRating="";
+  let selectedRental="";
 
   const params=()=>new URLSearchParams(location.search);
   const room=()=>params().get("room")||"";
@@ -62,13 +63,42 @@
     });
 
     (config.rentalPrices||[]).forEach(item=>{
-      const card=document.createElement("div");
+      const card=document.createElement("button");
+      const rentalValue=`租车服务-${item.name} ${item.price}`;
       card.className="rental-card";
+      card.type="button";
+      card.dataset.rentalValue=rentalValue;
+      card.setAttribute("aria-pressed","false");
       card.innerHTML=`<b>${item.name}</b><strong>${item.price}</strong><small>${item.note}</small>`;
+
       card.onclick=()=>{
-        selected.add(`租车服务-${item.name} ${item.price}`);
-        toast("已选择 "+item.name);
+        const wasSelected=selectedRental===rentalValue;
+
+        if(selectedRental)selected.delete(selectedRental);
+        selected.delete("租车服务");
+        selectedRental="";
+
+        document.querySelectorAll(".rental-card.selected").forEach(other=>{
+          other.classList.remove("selected");
+          other.setAttribute("aria-pressed","false");
+        });
+
+        if(wasSelected){
+          $("rentalSelection").classList.add("hidden");
+          $("rentalSelectionText").textContent="—";
+          toast("已取消 "+item.name);
+          return;
+        }
+
+        selectedRental=rentalValue;
+        selected.add(rentalValue);
+        card.classList.add("selected");
+        card.setAttribute("aria-pressed","true");
+        $("rentalSelectionText").textContent=`${item.name} · ${item.price}`;
+        $("rentalSelection").classList.remove("hidden");
+        toast(`已选择 ${item.name}，点击下方按钮提交`);
       };
+
       $("rentalGrid").appendChild(card);
     });
 
@@ -322,7 +352,14 @@
     p.delete("ticket");p.delete("track");
     history.replaceState(null,"",location.pathname+"?"+p.toString());
     selected.clear();
+    selectedRental="";
     document.querySelectorAll(".service-chip.selected").forEach(x=>x.classList.remove("selected"));
+    document.querySelectorAll(".rental-card.selected").forEach(x=>{
+      x.classList.remove("selected");
+      x.setAttribute("aria-pressed","false");
+    });
+    $("rentalSelection").classList.add("hidden");
+    $("rentalSelectionText").textContent="—";
     $("remark").value="";
     $("guestName").value="";
     $("submitRequest").disabled=false;
@@ -342,6 +379,10 @@
   };
 
   $("submitRequest").onclick=submit;
+  $("rentalSubmit").onclick=()=>{
+    if(!selectedRental){toast("请先选择一种车型");return}
+    submit();
+  };
   $("refreshStatus").onclick=()=>pollStatus(false);
   $("remindBtn").onclick=()=>guestAction("remind");
   $("resolvedBtn").onclick=()=>guestAction("resolved");

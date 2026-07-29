@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#173c35">
   <meta name="description" content="K8智享酒店住客服务">
-  <link rel="stylesheet" href="style.css?v=5.1">
+  <link rel="stylesheet" href="style.css?v=5.1.1">
   <title>K8智享酒店 · 住客服务</title>
 </head>
 <body>
@@ -111,6 +111,13 @@
       <section class="panel">
         <div class="section-head"><div><span>租车</span><h2>住客专享租车</h2></div><small>点击即可选择</small></div>
         <div id="rentalGrid" class="rental-grid"></div>
+        <div id="rentalSelection" class="rental-selection hidden" aria-live="polite">
+          <div>
+            <span>已选择车型</span>
+            <strong id="rentalSelectionText">—</strong>
+          </div>
+          <button id="rentalSubmit" type="button">提交租车需求</button>
+        </div>
       </section>
     </section>
 
@@ -130,7 +137,7 @@
     <footer><b>K8智享酒店</b><span>住客服务系统 V5.1</span></footer>
   </main>
   <div id="toast" class="toast hidden"></div>
-  <script src="config.js?v=5.1"></script>
-  <script src="app.js?v=5.1"></script>
+  <script src="config.js?v=5.1.1"></script>
+  <script src="app.js?v=5.1.1"></script>
 </body>
 </html>

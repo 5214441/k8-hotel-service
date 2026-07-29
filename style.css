@@ -160,3 +160,64 @@ button,input,textarea{font:inherit}.page-shell{max-width:760px;margin:auto;paddi
   text-align:center;
   font-weight:900;
 }
+
+
+/* V5.1.1 租车点击反馈 */
+.rental-card{
+  position:relative;
+  width:100%;
+  background:#fff;
+  color:var(--text);
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease,background .16s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.rental-card:active{transform:scale(.97)}
+.rental-card.selected{
+  border:2px solid var(--green2);
+  background:linear-gradient(180deg,#edf8f3,#e4f2ec);
+  box-shadow:0 8px 22px rgba(36,88,78,.16),inset 0 0 0 1px rgba(36,88,78,.08);
+  transform:translateY(-2px);
+}
+.rental-card.selected:after{
+  content:"✓ 已选择";
+  position:absolute;
+  right:7px;
+  top:7px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:var(--green2);
+  color:#fff;
+  font-size:10px;
+  font-weight:900;
+}
+.rental-card.selected strong{color:#176b50}
+.rental-selection{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:13px;
+  padding:14px;
+  border-radius:14px;
+  background:#e6f3ed;
+  border:1px solid #aacdbf;
+  box-shadow:0 8px 20px rgba(36,88,78,.08);
+}
+.rental-selection span,
+.rental-selection strong{display:block}
+.rental-selection span{font-size:12px;color:var(--muted)}
+.rental-selection strong{margin-top:4px;font-size:17px;color:var(--green)}
+.rental-selection button{
+  flex:0 0 auto;
+  border:0;
+  border-radius:12px;
+  padding:12px 15px;
+  background:linear-gradient(135deg,var(--green2),var(--green));
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+@media(max-width:480px){
+  .rental-selection{align-items:stretch;flex-direction:column}
+  .rental-selection button{width:100%}
+}
