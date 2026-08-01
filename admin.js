@@ -62,7 +62,7 @@
     const replies=config.quickReplies||["已收到，马上为您安排。","工作人员正在前往您的房间，请稍候。","当前需求较多，可能需要稍等，感谢理解。","物品已放在房门口，请查收。"];
     wrap.innerHTML=`<label>${type==="new"?"接单回复（客人实时可见）":"更新给客人的回复"}</label>
       <div class="reply-row"><input class="reply-input" maxlength="200" value="${escapeAttr(draft.reply)}"><select class="eta-select">
-      <option value="">不显示预计时间</option>${[3,5,10,15,20,30,45,60].map(n=>`<option value="${n}" ${String(draft.eta)===String(n)?"selected":""}>约${n}分钟</option>`).join("")}</select></div>
+      ${[3,5,10,15,20,30,45,60].map(n=>`<option value="${n}" ${String(draft.eta)===String(n)?"selected":""}>约${n}分钟</option>`).join("")}</select></div>
       <div class="quick-replies">${replies.map((x,i)=>`<button type="button" data-text="${escapeAttr(x)}">${["马上安排","正在前往","需要稍等","已放门口"][i]||"快捷回复"}</button>`).join("")}</div>`;
     const input=wrap.querySelector(".reply-input"),eta=wrap.querySelector(".eta-select");
     input.oninput=()=>getDraft(t,type).reply=input.value;
