@@ -1,8 +1,8 @@
 {
-    "versionCode":  5,
-    "versionName":  "2.0-universal",
-    "notes":  "Universal realtime service and mobile UI improvements",
-    "apkUrl":  "https://5214441.github.io/k8-hotel-service/app-update/K8FrontDesk-latest.apk",
-    "sha256":  "ea22677ef33cce7dc42ccb54bf29f9e12b2159731d4737177db4ceff0530e32b",
+    "versionCode":  6,
+    "versionName":  "2.1-ui",
+    "notes":  "Settings center and refreshed mobile interface",
+    "apkUrl":  "https://k8-hotel-web.aiyaoyao11.workers.dev/app-update/K8FrontDesk-latest.apk",
+    "sha256":  "e7e19de55f2446ffb0bd5cf93902afad9ef3e0a3937778ff2a0ab8fca7062f94",
     "force":  false
 }
