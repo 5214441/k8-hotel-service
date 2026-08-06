@@ -1,1 +1,8 @@
-
+{
+  "versionCode": 3,
+  "versionName": "1.1-update",
+  "notes": "首次加入应用内更新功能。",
+  "apkUrl": "https://5214441.github.io/k8-hotel-service/app-update/K8FrontDesk-latest.apk",
+  "sha256": "",
+  "force": false
+}
