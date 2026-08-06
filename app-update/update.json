@@ -1,8 +1,8 @@
 {
-  "versionCode": 3,
-  "versionName": "1.1-update",
-  "notes": "首次加入应用内更新功能。",
-  "apkUrl": "https://5214441.github.io/k8-hotel-service/app-update/K8FrontDesk-latest.apk",
-  "sha256": "",
-  "force": false
+    "versionCode":  4,
+    "versionName":  "1.2-auto-login",
+    "notes":  "Auto login for front desk page",
+    "apkUrl":  "https://5214441.github.io/k8-hotel-service/app-update/K8FrontDesk-latest.apk",
+    "sha256":  "f3522761c5311e84c8e31b3fb8cdabd27584c57ad87ed744c79b3781f2f14c92",
+    "force":  false
 }
