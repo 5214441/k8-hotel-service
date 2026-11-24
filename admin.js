@@ -243,3 +243,55 @@
   if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
   if(password){$("passwordInput").value=password;refresh(true)}
 })();
+
+/* V5.3 mobile view only: no change to authentication or API requests. */
+(function(){
+  const board=document.getElementById("mobileBoard");
+  const metrics=document.getElementById("mobileMetrics");
+  const toggle=document.getElementById("mobileMetricsToggle");
+  if(!board||!metrics||!toggle||!window.matchMedia)return;
+  const media=window.matchMedia("(max-width: 760px)");
+  const links=Array.from(document.querySelectorAll("[data-mobile-stage]"));
+  const stages=["new","accepted","done"];
+  let stage="new";
+  let expanded=false;
+  function render(){
+    if(media.matches){
+      board.dataset.mobileStage=stage;
+      links.forEach(link=>{
+        if(link.dataset.mobileStage===stage)link.setAttribute("aria-current","true");
+        else link.removeAttribute("aria-current");
+      });
+    }else{
+      delete board.dataset.mobileStage;
+      links.forEach(link=>link.removeAttribute("aria-current"));
+    }
+    metrics.classList.toggle("metrics-expanded",expanded);
+    toggle.setAttribute("aria-expanded",String(expanded));
+    toggle.textContent=expanded?"收起详细统计":"展开详细统计";
+  }
+  links.forEach(link=>link.addEventListener("click",event=>{
+    if(!media.matches||!stages.includes(link.dataset.mobileStage))return;
+    event.preventDefault();
+    stage=link.dataset.mobileStage;
+    render();
+    board.scrollIntoView({block:"start",behavior:"auto"});
+  }));
+  toggle.addEventListener("click",()=>{expanded=!expanded;render()});
+  if(media.addEventListener)media.addEventListener("change",render);
+  else if(media.addListener)media.addListener(render);
+  function syncCounts(){
+    [["newCount","mobileNewCount"],["acceptedCount","mobileAcceptedCount"],["doneCount","mobileDoneCount"]].forEach(([source,target])=>{
+      const a=document.getElementById(source),b=document.getElementById(target);
+      if(a&&b)b.textContent=a.textContent;
+    });
+  }
+  if(window.MutationObserver){
+    const observer=new MutationObserver(syncCounts);
+    ["newCount","acceptedCount","doneCount"].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)observer.observe(el,{childList:true,characterData:true,subtree:true});
+    });
+  }
+  render();syncCounts();
+})();
