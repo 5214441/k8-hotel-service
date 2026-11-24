@@ -3,63 +3,60 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#102a43">
-  <meta name="description" content="K8智享酒店前台服务工单台">
+  <meta name="theme-color" content="#14293d">
+  <meta name="description" content="K8智享酒店前台服务工作台">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="admin.css?v=5.1">
+  <link rel="stylesheet" href="admin.css?v=5.2">
   <title>K8酒店 · 前台工单台</title>
 </head>
 <body>
   <header class="topbar">
     <div class="admin-brand">
       <img src="assets/k8-hotel-logo-white.png" alt="K8智享酒店">
-      <div><h1>前台服务工单台</h1><p id="clock">正在同步时间</p></div>
+      <div><h1>前台服务工作台</h1><p id="clock">正在同步时间</p></div>
     </div>
     <div class="top-actions">
-      <span id="networkBadge" class="badge ok">在线</span>
+      <span id="networkBadge" class="badge bad" role="status">未连接</span>
       <button id="soundBtn" class="btn">开启声音提醒</button>
       <button id="notifyBtn" class="btn">开启桌面通知</button>
-      <button id="refreshBtn" class="btn">立即刷新</button>
+      <button id="refreshBtn" class="btn refresh-btn">立即刷新</button>
     </div>
   </header>
 
-  <section class="dutybar">
+  <section class="dutybar" aria-label="运营概况">
+    <div class="section-heading"><div><p class="eyebrow">FRONT DESK / SERVICE</p><h2>今日服务概况</h2><p class="section-note">优先处理新工单与未解决需求</p></div><div class="duty-actions"><button id="historyBtn" class="history-btn">历史工单</button><button id="logoutBtn" class="link-btn">退出管理</button></div></div>
     <div class="summary">
-      <span>新工单 <b id="newCount">0</b></span>
-      <span>处理中 <b id="acceptedCount">0</b></span>
-      <span>今日完成 <b id="doneCount">0</b></span>
-      <span>平均响应 <b id="avgResponse">—</b></span>
-      <span>平均完成 <b id="avgComplete">—</b></span>
-      <span>未解决 <b id="unresolvedCount">0</b></span>
-      <span>今日满意率 <b id="satisfactionRate">—</b></span>
-      <span>不满意评价 <b id="badRatingCount">0</b></span>
-    </div>
-    <div class="duty-actions">
-      <button id="historyBtn" class="history-btn">历史工单</button>
-      <button id="logoutBtn" class="link-btn">退出管理</button>
+      <div class="metric metric-new"><small>待接单</small><b id="newCount">0</b><em>优先响应</em></div>
+      <div class="metric metric-active"><small>处理中</small><b id="acceptedCount">0</b><em>跟进进度</em></div>
+      <div class="metric metric-done"><small>今日完成</small><b id="doneCount">0</b><em>服务已处理</em></div>
+      <div class="metric metric-alert"><small>未解决</small><b id="unresolvedCount">0</b><em>需要关注</em></div>
+      <div class="metric"><small>平均响应</small><b id="avgResponse">—</b><em>响应效率</em></div>
+      <div class="metric"><small>平均完成</small><b id="avgComplete">—</b><em>处理效率</em></div>
+      <div class="metric"><small>今日满意率</small><b id="satisfactionRate">—</b><em>服务质量</em></div>
+      <div class="metric"><small>不满意评价</small><b id="badRatingCount">0</b><em>留意反馈</em></div>
     </div>
   </section>
-
-  <main class="board">
-    <section class="column new-column">
-      <div class="column-head"><h2>🔴 新工单</h2><small>超过5分钟开始提醒</small></div>
+  <section class="board-toolbar" aria-label="工单看板导航"><div><h2>实时工单</h2><p>按处理阶段分类，自动同步更新</p></div><nav class="board-nav" aria-label="快速定位工单"><a href="#newColumn">待接单</a><a href="#acceptedColumn">处理中</a><a href="#doneColumn">已完成</a></nav></section>
+  <main class="board" aria-label="实时工单看板">
+    <section class="column new-column" id="newColumn" aria-labelledby="newTitle">
+      <div class="column-head"><h2 id="newTitle">待接单</h2><small>超过5分钟开始提醒</small></div>
       <div id="newList" class="ticket-list"></div>
     </section>
-    <section class="column">
-      <div class="column-head"><h2>🟡 处理中</h2><small>预计时间自动倒计时</small></div>
+    <section class="column accepted-column" id="acceptedColumn" aria-labelledby="acceptedTitle">
+      <div class="column-head"><h2 id="acceptedTitle">处理中</h2><small>预计时间自动倒计时</small></div>
       <div id="acceptedList" class="ticket-list"></div>
     </section>
-    <section class="column">
-      <div class="column-head"><h2>🟢 今日已完成</h2><small>5分钟内可撤销完成</small></div>
+    <section class="column done-column" id="doneColumn" aria-labelledby="doneTitle">
+      <div class="column-head"><h2 id="doneTitle">今日已完成</h2><small>5分钟内可撤销完成</small></div>
       <div id="doneList" class="ticket-list"></div>
     </section>
   </main>
 
-  <section id="historyPanel" class="history-overlay hidden">
+  <section id="historyPanel" class="history-overlay hidden" role="dialog" aria-label="历史工单查询">
     <div class="history-dialog">
       <div class="history-head">
-        <div><h2>历史工单查询</h2><p>服务器分页查询，不再限制最近300条。</p></div>
-        <button id="historyClose" class="history-close">×</button>
+        <div><h2>历史工单查询</h2><p>按日期、房间号及关键词筛选记录</p></div>
+        <button id="historyClose" class="history-close" aria-label="关闭历史工单">×</button>
       </div>
       <div class="history-filters">
         <label>开始日期<input id="historyFrom" type="date"></label>
@@ -83,11 +80,11 @@
     </div>
   </section>
 
-  <section id="eventPanel" class="history-overlay hidden">
+  <section id="eventPanel" class="history-overlay hidden" role="dialog" aria-label="工单操作记录">
     <div class="event-dialog">
       <div class="history-head">
         <div><h2>工单操作记录</h2><p id="eventTicketId"></p></div>
-        <button id="eventClose" class="history-close">×</button>
+        <button id="eventClose" class="history-close" aria-label="关闭操作记录">×</button>
       </div>
       <div id="eventList" class="event-list"></div>
     </div>
@@ -98,14 +95,14 @@
       <img class="login-brand-logo" src="assets/k8-hotel-logo-dark.png" alt="K8智享酒店">
       <h2>前台工单台登录</h2>
       <p>请输入部署时设置的管理密码。</p>
-      <input id="passwordInput" type="password" autocomplete="current-password" placeholder="管理密码" required>
+      <label class="password-label" for="passwordInput">管理密码</label><input id="passwordInput" type="password" autocomplete="current-password" placeholder="管理密码" required>
       <label class="remember"><input id="rememberPassword" type="checkbox"> 在这台前台电脑上记住密码</label>
       <button class="primary" type="submit">进入工单台</button>
-      <div id="loginError" class="error hidden"></div>
+      <div id="loginError" class="error hidden" role="alert"></div>
     </form>
   </div>
 
-  <div id="toast" class="toast hidden"></div>
+  <div id="toast" class="toast hidden" role="status"></div>
   <script src="config.js?v=5.1"></script>
   <script src="realtime-hook.js?v=1"></script>
   <script src="admin.js?v=5.1"></script>
