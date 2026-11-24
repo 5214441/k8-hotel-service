@@ -1,7 +1,7 @@
-const CACHE="k8-hotel-v5-1";
+const CACHE="k8-hotel-v5-2-admin";
 const ASSETS=[
   "./","./index.html?v=5.1","./style.css?v=5.1","./app.js?v=5.1","./config.js?v=5.1",
-  "./admin.html?v=5.1","./admin.css?v=5.1","./admin.js?v=5.1",
+  "./admin.html?v=5.1","./admin.html?v=5.2","./admin.css?v=5.2","./admin.js?v=5.1",
   "./qr.html?v=5.1","./qr.css?v=5.1","./qr.js?v=5.1",
   "./manifest.webmanifest",
   "./assets/k8-hotel-logo-white.png","./assets/k8-hotel-logo-dark.png",
