@@ -98,3 +98,94 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 @media(max-width:760px){.topbar{align-items:stretch;flex-direction:column;padding:14px 16px;gap:12px}.admin-brand img{width:112px;height:42px}.admin-brand h1{font-size:17px}.top-actions{justify-content:flex-start}.btn{flex:1 1 auto}.dutybar{padding-top:18px}.summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{padding:11px 12px}.metric b{font-size:25px}.board{grid-template-columns:1fr}.done-column{grid-column:auto}.done-column .ticket-list{display:flex}.column{min-height:0}.board-toolbar{align-items:flex-start;flex-direction:column}.board-nav{width:100%}.board-nav a{flex:1;text-align:center;padding:11px 8px}.history-overlay{padding:0}.history-dialog,.event-dialog{border-radius:0;min-height:100vh}.history-results{max-height:none}.history-count{margin-left:0}.history-head,.history-filters,.history-actions,.history-pagination{padding:12px}.event-item{grid-template-columns:minmax(0,1fr) auto;gap:6px}.event-message{grid-column:1/-1}}
 @media(max-width:400px){.section-heading{align-items:flex-start;flex-direction:column}.duty-actions{width:100%}.duty-actions button{flex:1}.meta{grid-template-columns:1fr}.reply-row{grid-template-columns:1fr}.history-filters{grid-template-columns:1fr}.history-keyword{grid-column:auto}.ticket-actions button{flex-basis:calc(50% - 8px)}.login-card{padding:24px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* V5.3 staff mobile workspace. Desktop V5.2 styles remain unchanged. */
+.mobile-metrics-toggle,.mobile-tab-count{display:none}
+@media(max-width:760px){
+  body{background:#f3f6fa}
+  .topbar{padding:12px 14px 10px;gap:10px}
+  .admin-brand{gap:11px;align-items:center}
+  .admin-brand img{width:102px;height:40px;flex-shrink:0}
+  .admin-brand h1{font-size:16px;line-height:1.35}
+  .topbar p{font-size:11px}
+  .top-actions{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));align-items:center;gap:5px}
+  .top-actions .badge{font-size:10px;padding:6px;justify-content:center;white-space:normal;text-align:center}
+  .top-actions .btn{min-height:44px;padding:7px 4px;font-size:11px;line-height:1.35;min-width:0;overflow-wrap:anywhere}
+  .dutybar{padding:14px 12px 8px}
+  .section-heading{flex-direction:row;align-items:center;gap:8px;margin-bottom:10px}
+  .section-heading h2{font-size:18px}
+  .section-heading .eyebrow{font-size:9px}
+  .section-note{display:none}
+  .duty-actions{width:auto;flex-shrink:0;gap:5px}
+  .duty-actions button{min-height:44px;font-size:11px;padding:7px 9px}
+  .summary{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .metric{min-width:0;border-radius:9px;padding:9px 6px 8px;box-shadow:none;text-align:center}
+  .metric small{font-size:11px;white-space:normal}
+  .metric b{font-size:24px;line-height:1.2;margin:5px 0 1px}
+  .metric em{display:none}
+  .metric-detail{display:none}
+  .summary.metrics-expanded .metric-detail{display:block}
+  .metric-detail b{font-size:17px;letter-spacing:-.04em}
+  .mobile-metrics-toggle{display:block;min-height:44px;width:100%;margin-top:4px;border:0;background:transparent;color:#38566d;font-size:12px;font-weight:700}
+  .mobile-metrics-toggle:after{content:"  ▾"}
+  .mobile-metrics-toggle[aria-expanded="true"]:after{content:"  ▴"}
+  .board-toolbar{position:sticky;top:0;z-index:7;padding:9px 12px 10px;background:#f3f6fa;border-bottom:1px solid #dce5ed;gap:7px;box-shadow:0 4px 10px #14293d09}
+  .board-toolbar>div{display:none}
+  .board-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .board-nav a{min-width:0;min-height:46px;display:flex;align-items:center;justify-content:center;gap:4px;padding:8px 4px;border-radius:9px;font-size:12px;background:#fff;color:#42596c;white-space:nowrap}
+  .mobile-tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:21px;padding:1px 4px;font-size:11px;background:#edf1f5;color:#455a6b;border-radius:6px;font-variant-numeric:tabular-nums}
+  .board-nav a[aria-current="true"]{background:#14293d;color:#fff;border-color:#14293d}
+  .board-nav a[aria-current="true"] .mobile-tab-count{background:#ffffff24;color:#fff}
+  .board{display:grid;grid-template-columns:1fr;gap:10px;padding:10px 12px calc(22px + env(safe-area-inset-bottom));scroll-margin-top:74px;min-height:calc(100vh - 240px)}
+  .board[data-mobile-stage="new"]>.column:not(.new-column),.board[data-mobile-stage="accepted"]>.column:not(.accepted-column),.board[data-mobile-stage="done"]>.column:not(.done-column){display:none}
+  .column{padding:10px 8px 9px;border-radius:12px;min-height:230px;background:#eaf0f5}
+  .column-head{padding:3px 3px 11px;gap:5px}
+  .column-head h2{font-size:15px}.column-head small{font-size:10px}
+  .ticket{padding:13px;border-radius:10px;box-shadow:0 2px 8px #14293d0a}
+  .ticket-head{align-items:center}.room{font-size:29px}.ticket-id{max-width:44%;font-size:10px}
+  .service{font-size:16px;margin:9px 0 7px}
+  .meta{grid-template-columns:1fr 1fr;gap:6px;font-size:12px}
+  .meta .countdown{grid-column:auto;font-weight:800;color:#28435a}
+  .ticket.warn .countdown{color:#91600a}.ticket.urgent .countdown,.ticket.critical .countdown,.meta .countdown.overdue{color:#ac2929}
+  .reply-controls{padding:10px;margin-top:12px}
+  .reply-row{grid-template-columns:minmax(0,1fr) 96px;gap:6px}
+  .reply-row input,.reply-row select{font-size:16px;min-height:46px;padding:9px 7px}
+  .reply-row select{font-size:14px}
+  .quick-replies{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .quick-replies button{min-width:0;min-height:40px;font-size:12px;padding:6px 4px}
+  .ticket-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .ticket-actions button{min-width:0;min-height:46px;font-size:14px;padding:9px 6px;overflow-wrap:anywhere}
+  .ticket-actions .event-button{grid-column:1/-1;min-height:42px;font-size:12px}
+  .ticket-actions button:only-child{grid-column:1/-1}
+  .history-overlay{padding:0;overscroll-behavior:contain}
+  .history-dialog,.event-dialog{min-height:100dvh;border:0}
+  .history-head{position:sticky;top:0;z-index:2}
+  .history-filters input,.history-filters select{font-size:16px;min-height:44px}
+  .history-actions button,.history-pagination button{min-height:44px}
+  .history-results{padding:10px}
+  .history-table-wrap{overflow:visible;border:0;background:transparent;border-radius:0}
+  .history-table{display:block;min-width:0;width:100%}
+  .history-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+  .history-table tbody{display:grid;gap:10px}
+  .history-table tr{display:block;background:#fff!important;border:1px solid #dce5ed;border-radius:10px;padding:8px 11px}
+  .history-table td{display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px;border:0;border-bottom:1px solid #edf1f5;padding:7px 0;font-size:12px;overflow-wrap:anywhere;word-break:break-word}
+  .history-table td:last-child{border:0}
+  .history-table td:before{color:#52687c;font-weight:700}
+  .history-table td:nth-child(1):before{content:"房间"} .history-table td:nth-child(2):before{content:"状态"} .history-table td:nth-child(3):before{content:"服务与备注"} .history-table td:nth-child(4):before{content:"时间"} .history-table td:nth-child(5):before{content:"总耗时"} .history-table td:nth-child(6):before{content:"前台回复"} .history-table td:nth-child(7):before{content:"客人确认"} .history-table td:nth-child(8):before{content:"服务评价"} .history-table td:nth-child(9):before{content:"工单号"}
+  .history-table td{display:block}.history-table td:before{display:inline-block;min-width:72px;margin-right:7px;vertical-align:top}
+  .history-status{vertical-align:middle}
+  .login-card{padding:24px 22px;border-radius:16px}
+  .login-brand-logo{width:180px;height:74px}
+  .login-card .remember input{width:18px;height:18px;flex-shrink:0}
+  .toast{bottom:calc(18px + env(safe-area-inset-bottom));font-size:13px}
+}
+@media(max-width:350px){
+  .top-actions{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .top-actions .badge{grid-column:1/-1;justify-self:start}
+  .section-heading h2{font-size:16px}
+  .duty-actions button{padding:7px 5px}
+  .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .reply-row{grid-template-columns:1fr}
+  .meta{grid-template-columns:1fr}
+  .board-nav a{font-size:11px;gap:2px}
+}
